@@ -46,7 +46,7 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 ## 🛠️ Stack technique (proposée)
 
 - **Frontend** : Spring MVC
-- **Backend** : Node.js ou Python (FastAPI/Flask)
+- **Backend** : java JEE SpringBoot
 - **Base de données** : MySql
 - **API vulnérabilités** : NVD
 - **Outils externes** : Nmap
