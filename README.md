@@ -28,7 +28,7 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 - Archivage et traçabilité
 
 ### 🔎 Détection des vulnérabilités
-- Connexion à une API (Google OSV)
+- Connexion à une API (NVD_API)
 - Analyse des CVE connues
 - Statut des composants : 🔴 vulnérable, 🟡 à mettre à jour, 🟢 à jour
 
