@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liste des utilisateurs</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<h1>Liste des utilisateurs</h1>
+
+<table border="1" cellpadding="10" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Matricule</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Email</th>
+        <th>Rôle</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}">1</td>
+        <td th:text="${user.matricule}">MA-01-2025</td>
+        <td th:text="${user.nom}">Dupont</td>
+        <td th:text="${user.prenom}">Jean</td>
+        <td th:text="${user.email}">jean.dupont@example.com</td>
+        <td th:text="${user.role}">ROLE_USER</td>
+        <td>
+            <a th:href="@{'/admin/users/edit/' + ${user.id}}">Modifier</a> |
+            <a th:href="@{'/admin/users/delete/' + ${user.id}}"
+               onclick="return confirm('Supprimer cet utilisateur ?');">Supprimer</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/admin/users/create">Ajouter un nouvel utilisateur</a>
+
+</body>
+</html>
