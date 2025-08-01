@@ -75,6 +75,3 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 **Anas AIT EL QADI**  
 Projet de stage 4IIR - 2024/2025
 
----
-
-> _“Sécuriser, c’est prévenir avant de guérir.”_
