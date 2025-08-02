@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion | Portail Entreprise</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;   /* Bleu foncé corporate */
+            --secondary-color: #3498db;  /* Bleu vif */
+            --accent-color: #e74c3c;    /* Rouge pour les accents */
+            --light-bg: #f8f9fa;        /* Fond clair */
+            --text-color: #495057;      /* Couleur texte principale */
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        }
+
+        .login-brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-brand img {
+            height: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .login-brand h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.8rem;
+        }
+
+        .login-container {
+            max-width: 420px;
+            width: 100%;
+            padding: 2.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin: 0 auto;
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.15);
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-right: none;
+        }
+
+        .form-floating label {
+            color: #6c757d;
+            padding-left: 3rem;
+        }
+
+        .btn-login {
+            background-color: var(--secondary-color);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            width: 100%;
+            border-radius: 6px;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-login:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .forgot-password {
+            text-align: right;
+        }
+
+        .forgot-password a {
+            color: var(--text-color);
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            color: var(--secondary-color);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #adb5bd;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .divider-text {
+            padding: 0 10px;
+            font-size: 0.85rem;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-color);
+        }
+
+        .login-footer a {
+            color: var(--secondary-color);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .alert-custom {
+            border-left: 4px solid;
+            padding: 1rem;
+        }
+
+        .alert-danger {
+            border-left-color: var(--accent-color);
+            background-color: rgba(231, 76, 60, 0.08);
+        }
+
+        .alert-success {
+            border-left-color: #2ecc71;
+            background-color: rgba(46, 204, 113, 0.08);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="login-container">
+        <!-- Logo entreprise -->
+        <div class="login-brand">
+            <img src="https://via.placeholder.com/150x60?text=LOGO" alt="Logo Entreprise" class="img-fluid">
+            <h1>Portail Entreprise</h1>
+        </div>
+
+        <!-- Messages d'alerte -->
+        <div th:if="${param.error}" class="alert alert-danger alert-custom alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            Identifiants incorrects. Veuillez réessayer.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${param.logout}" class="alert alert-success alert-custom alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            Vous avez été déconnecté avec succès.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Formulaire -->
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" name="username"
+                               placeholder="name@example.com" required>
+                        <label for="email">Adresse email professionnelle</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="Mot de passe" required>
+                        <label for="password">Mot de passe</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberMe" name="remember-me">
+                    <label class="form-check-label small" for="rememberMe">Maintenir la connexion</label>
+                </div>
+                <div class="forgot-password">
+                    <a href="#"><i class="fas fa-question-circle me-1"></i>Mot de passe oublié ?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-login btn-primary mb-3">
+                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+            </button>
+
+            <div class="divider">
+                <span class="divider-text">OU</span>
+            </div>
+
+            <div class="login-footer">
+                <p>Nouvel employé ? <a href="#" class="fw-medium">Contactez le support</a></p>
+                <p class="mt-2 small text-muted">© 2023 Nom Entreprise. Tous droits réservés.</p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

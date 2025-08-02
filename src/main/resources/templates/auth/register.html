@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .register-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin: 0 auto;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #858796;
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .btn-register {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            width: 100%;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .btn-register:hover {
+            background-color: #3a5bc7;
+        }
+
+        .form-floating label {
+            padding: 12px 15px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .divider-text {
+            padding: 0 10px;
+            color: #b7b9cc;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="register-container">
+        <div class="register-header">
+            <h1><i class="fas fa-user-plus me-2"></i>Créer un compte</h1>
+            <p>Remplissez le formulaire pour vous inscrire</p>
+        </div>
+
+        <!-- Messages d'erreur -->
+        <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+            <ul>
+                <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+        <form th:action="@{/register}" th:object="${user}" method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="nom" th:field="*{nom}"
+                               placeholder="Nom" required>
+                        <label for="nom"><i class="fas fa-user me-2"></i>Nom</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="prenom" th:field="*{prenom}"
+                               placeholder="Prénom" required>
+                        <label for="prenom"><i class="fas fa-user me-2"></i>Prénom</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="email" th:field="*{email}"
+                       placeholder="Email" required>
+                <label for="email"><i class="fas fa-envelope me-2"></i>Email</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password" th:field="*{password}"
+                       placeholder="Mot de passe" required>
+                <label for="password"><i class="fas fa-lock me-2"></i>Mot de passe</label>
+                <small class="form-text text-muted">Minimum 8 caractères avec majuscule, minuscule, chiffre et caractère spécial</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="date" class="form-control" id="dateNaissance" th:field="*{dateNaissance}"
+                               placeholder="Date de naissance">
+                        <label for="dateNaissance"><i class="fas fa-calendar me-2"></i>Date de naissance</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="telephone" th:field="*{telephone}"
+                               placeholder="Téléphone">
+                        <label for="telephone"><i class="fas fa-phone me-2"></i>Téléphone</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="adresse" th:field="*{adresse}"
+                       placeholder="Adresse">
+                <label for="adresse"><i class="fas fa-map-marker-alt me-2"></i>Adresse</label>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="ville" th:field="*{ville}"
+                               placeholder="Ville">
+                        <label for="ville"><i class="fas fa-city me-2"></i>Ville</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="pays" th:field="*{pays}"
+                               placeholder="Pays" required>
+                        <label for="pays"><i class="fas fa-globe me-2"></i>Pays</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-register mb-3">
+                <i class="fas fa-user-plus me-2"></i>S'inscrire
+            </button>
+
+            <div class="divider">
+                <span class="divider-text">OU</span>
+            </div>
+
+            <div class="text-center">
+                <p class="mb-0">Déjà un compte ? <a th:href="@{/login}" class="text-primary">Se connecter</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
