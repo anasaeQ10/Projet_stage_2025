@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -102,6 +102,70 @@
             color: var(--primary-color);
             font-weight: bold;
         }
+
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .btn-logout {
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .btn-logout:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .dashboard-header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2c3e50;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-avatar:hover {
+            background-color: #e0e3e7;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -110,9 +174,37 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="h4 mb-0 page-title">Gestion des Utilisateurs</h1>
+
+            <!-- Section utilisateur connecté -->
             <div class="d-flex align-items-center">
-                <span class="me-3">Bienvenue, <strong>Admin</strong></span>
-                <div class="user-avatar">A</div>
+                <!-- Affichage du nom -->
+                <span class="me-3" sec:authorize="isAuthenticated()">
+                    Bienvenue, <strong sec:authentication="name">Admin</strong>
+                </span>
+
+                <!-- Avatar avec menu déroulant -->
+                <div class="dropdown">
+                    <div class="user-avatar dropdown-toggle" id="userDropdown"
+                         data-bs-toggle="dropdown" aria-expanded="false"
+                         sec:authentication="principal.username.substring(0,1)">A</div>
+
+                    <!-- Menu déroulant -->
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li>
+                            <a class="dropdown-item" href="/profile">
+                                <i class="fas fa-user-circle me-2"></i>Mon profil
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
