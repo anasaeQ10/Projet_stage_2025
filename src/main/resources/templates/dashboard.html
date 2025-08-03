@@ -3,119 +3,233 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title>Tableau de Bord | Gestion des Utilisateurs</title>
-        <style>
-            :root {
-                --primary: #4e73df;
-                --dark: #2c3e50;
-                --light: #f8f9fa;
-                --success: #28a745;
-                --danger: #dc3545;
-                --warning: #ffc107;
-            }
+    <title>Gestion des Utilisateurs | Tableau de Bord</title>
+    <style>
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --primary-hover: #3a5bc7;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --lighter: #ffffff;
+            --border: #e3e6f0;
+            --text-muted: #6c757d;
+            --text-dark: #343a40;
+        }
 
-            .dashboard-container {
-                background-color: white;
-                border-radius: 0.5rem;
-                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-                padding: 1.5rem;
-                margin-bottom: 1.5rem;
-            }
+        /* Container amélioré */
+        .dashboard-container {
+            background-color: var(--lighter);
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            padding: 2rem;
+            border: 1px solid var(--border);
+        }
 
-            .table-header {
-                background-color: var(--dark);
-                color: white;
-            }
+        /* En-tête de tableau */
+        .table-header {
+            background-color: var(--primary);
+            color: white;
+            position: sticky;
+            top: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
 
-            .user-avatar {
-                width: 2.5rem;
-                height: 2.5rem;
-                border-radius: 50%;
-                background-color: var(--light);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 600;
-                color: var(--dark);
-                transition: all 0.2s;
-            }
+        .table-header th {
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
 
-            .user-avatar:hover {
-                transform: scale(1.05);
-            }
+        /* Avatar utilisateur */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #a2c0f9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-            .badge-admin {
-                background-color: var(--primary);
-            }
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
 
-            .badge-user {
-                background-color: #6c757d;
-            }
+        /* Badges */
+        .badge-admin {
+            background-color: var(--primary);
+            padding: 0.4em 0.8em;
+            font-weight: 500;
+        }
 
-            .action-btn {
-                width: 2rem;
-                height: 2rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                padding: 0;
-            }
+        .badge-user {
+            background-color: #6c757d;
+            padding: 0.4em 0.8em;
+            font-weight: 500;
+        }
 
-            /* Animation pour les lignes du tableau */
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
+        /* Boutons d'action */
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: all 0.2s;
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
 
-            tr {
-                animation: fadeIn 0.3s ease-out;
-                animation-fill-mode: both;
-            }
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
 
-            tr:nth-child(1) { animation-delay: 0.1s; }
-            tr:nth-child(2) { animation-delay: 0.2s; }
-            tr:nth-child(3) { animation-delay: 0.3s; }
-            /* Continuez selon le nombre de lignes attendues */
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
 
-            /* Effet de survol sur les lignes */
-            tr:hover {
-                background-color: rgba(0, 0, 0, 0.02);
-            }
-        </style>
+        .btn-outline-primary:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Barre de recherche */
+        .search-box {
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            padding-left: 1.25rem;
+        }
+
+        .search-box:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Bouton principal */
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            border-radius: 10px;
+            padding: 0.625rem 1.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.2);
+        }
+
+        /* Animation des lignes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        tbody tr {
+            animation: fadeIn 0.4s ease-out forwards;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        tbody tr:nth-child(1) { animation-delay: 0.05s; }
+        tbody tr:nth-child(2) { animation-delay: 0.1s; }
+        tbody tr:nth-child(3) { animation-delay: 0.15s; }
+        tbody tr:nth-child(4) { animation-delay: 0.2s; }
+        tbody tr:nth-child(5) { animation-delay: 0.25s; }
+        tbody tr:nth-child(n+6) { animation-delay: 0.3s; }
+
+        /* Effet de survol */
+        tbody tr:hover {
+            background-color: rgba(78, 115, 223, 0.03) !important;
+        }
+
+        /* Cellules du tableau */
+        tbody td {
+            padding: 1rem 1.25rem;
+            vertical-align: middle;
+            border-color: var(--border);
+            color: var(--text-dark);
+        }
+
+        /* Style pour la pagination */
+        .page-item .page-link {
+            border-radius: 8px !important;
+            margin: 0 4px;
+            border: none;
+            color: var(--text-muted);
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(78, 115, 223, 0.2);
+        }
+
+        /* Message vide */
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #e9ecef;
+        }
+    </style>
 </head>
 <body>
 
 <div layout:fragment="content">
     <div class="container-fluid py-4">
         <div class="dashboard-container">
-            <!-- Barre d'outils améliorée -->
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
-                <form class="d-flex flex-grow-1 me-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="search" class="form-control border-start-0"
-                               placeholder="Rechercher utilisateur..." aria-label="Search">
-                    </div>
-                </form>
+            <!-- En-tête amélioré -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+                <h2 class="h4 mb-3 mb-md-0 text-gray-800 fw-bold">
+                    <i class="fas fa-users me-2 text-primary"></i>Gestion des Utilisateurs
+                </h2>
 
-                <a href="#" class="btn btn-primary d-flex align-items-center">
-                    <i class="fas fa-plus me-2"></i>Nouvel Utilisateur
-                </a>
+                <div class="d-flex flex-column flex-md-row gap-3 w-100 w-md-auto">
+                    <!-- Barre de recherche -->
+                    <div class="search-container flex-grow-1 me-md-3 position-relative">
+                        <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="search" class="form-control search-box ps-5"
+                               placeholder="Rechercher un utilisateur..."
+                               aria-label="Search"
+                               id="userSearch">
+                    </div>
+
+                    <!-- Bouton d'ajout -->
+                    <button class="btn btn-primary d-flex align-items-center">
+                        <i class="fas fa-plus me-2"></i>Nouvel Utilisateur
+                    </button>
+                </div>
             </div>
 
-            <!-- Tableau optimisé -->
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <!-- Tableau -->
+            <div class="table-responsive rounded-3 border">
+                <table class="table table-hover align-middle mb-0">
                     <thead class="table-header">
                     <tr>
-                        <th scope="col" style="width: 5%">#</th>
-                        <th scope="col" style="width: 25%">Utilisateur</th>
-                        <th scope="col" style="width: 25%">Email</th>
-                        <th scope="col" style="width: 15%">Rôle</th>
-                        <th scope="col" style="width: 20%">Dernière activité</th>
-                        <th scope="col" style="width: 10%">Actions</th>
+                        <th scope="col">Utilisateur</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Rôle</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col" class="text-end">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -126,32 +240,44 @@
                                      th:text="${user.nom.substring(0,1) + user.prenom.substring(0,1)}"></div>
                                 <div>
                                     <div th:text="${user.nom + ' ' + user.prenom}" class="fw-bold"></div>
+                                    <small class="text-muted" th:text="${user.nom + ' ' + user.prenom}"></small>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <a th:href="'mailto:' + ${user.email}" class="text-decoration-none"
-                               th:text="${user.email}"></a>
+                            <a th:href="'mailto:' + ${user.email}" class="text-decoration-none text-primary">
+                                <i class="fas fa-envelope me-1 text-muted"></i>
+                                <span th:text="${user.email}"></span>
+                            </a>
                         </td>
                         <td>
                             <span class="badge rounded-pill"
                                   th:classappend="${user.role == 'ROLE_ADMIN'} ? 'badge-admin' : 'badge-user'"
-                                  th:text="${user.role == 'ROLE_ADMIN'} ? 'Administrateur' : 'Utilisateur'"></span>
+                                  th:text="${user.role == 'ROLE_ADMIN'} ? 'Admin' : 'Utilisateur'"></span>
                         </td>
                         <td>
-                            <div class="d-flex gap-2">
-                                <a href="#" class="btn btn-sm btn-outline-primary action-btn"
+                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>
+                                Actif
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a th:href="@{/admin/users/{id}(id=${user.id})}"
+                                   class="btn btn-sm btn-outline-primary action-btn"
                                    data-bs-toggle="tooltip" title="Voir profil">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-outline-secondary action-btn"
+                                <a th:href="@{/admin/users/edit/{id}(id=${user.id})}"
+                                   class="btn btn-sm btn-outline-secondary action-btn"
                                    data-bs-toggle="tooltip" title="Modifier">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-outline-danger action-btn"
-                                   data-bs-toggle="tooltip" title="Supprimer">
+                                <button class="btn btn-sm btn-outline-danger action-btn"
+                                        data-bs-toggle="tooltip" title="Supprimer"
+                                        onclick="confirmDelete('${user.id}', '${user.nom}')">
                                     <i class="fas fa-trash-alt"></i>
-                                </a>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -163,27 +289,48 @@
     </div>
 </div>
 
-<th:block layout:fragment="custom-js">
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Activer les tooltips Bootstrap
-            [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                .forEach(function (tooltipTriggerEl) {
-                    new bootstrap.Tooltip(tooltipTriggerEl);
-                });
+            // Initialisation des tooltips
+            const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltips.map(el => new bootstrap.Tooltip(el, {
+                placement: 'top',
+                trigger: 'hover'
+            }));
 
-            // Gestion dynamique de la recherche
-            const searchInput = document.querySelector('input[type="search"]');
-            searchInput.addEventListener('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase();
-                document.querySelectorAll('tbody tr').forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+            // Recherche instantanée
+            const searchInput = document.getElementById('userSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const term = e.target.value.toLowerCase();
+                    document.querySelectorAll('tbody tr').forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(term) ? '' : 'none';
+                    });
                 });
-            });
+            }
         });
+
+        // Fonction de confirmation de suppression
+        function confirmDelete(id, name) {
+            Swal.fire({
+                title: 'Confirmer la suppression',
+                html: `Êtes-vous sûr de vouloir supprimer <b>${name}</b> ?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Supprimer',
+                cancelButtonText: 'Annuler',
+                backdrop: 'rgba(0,0,0,0.1)'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Ajouter ici la logique de suppression
+                }
+            });
+        }
     </script>
-</th:block>
+
 
 </body>
 </html>
