@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8" />
+    <title>Modifier mon profil</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 0 20px; }
+        h1 { color: #2c3e50; margin-bottom: 20px; }
+        form { display: flex; flex-direction: column; }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            padding: 8px;
+            font-size: 1em;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .error {
+            color: #b00020;
+            font-size: 0.9em;
+            margin-top: 2px;
+        }
+        button {
+            margin-top: 20px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1f6391;
+        }
+        .alert {
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        .back-link {
+            margin-top: 10px;
+            text-decoration: none;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Modifier mon profil</h1>
+
+<!-- Messages flash -->
+<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+<form th:action="@{/user/profile/update}" th:object="${userForm}" method="post" novalidate>
+
+    <label for="prenom">Prénom :</label>
+    <input type="text" id="prenom" th:field="*{prenom}" />
+    <div th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}" class="error"></div>
+
+    <label for="nom">Nom :</label>
+    <input type="text" id="nom" th:field="*{nom}" />
+    <div th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}" class="error"></div>
+
+    <label for="email">Email :</label>
+    <input type="email" id="email" th:field="*{email}" />
+    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></div>
+
+    <label for="adresse">Adresse :</label>
+    <input type="text" id="adresse" th:field="*{adresse}" />
+    <div th:if="${#fields.hasErrors('adresse')}" th:errors="*{adresse}" class="error"></div>
+
+    <label for="pays">Pays :</label>
+    <input type="text" id="pays" th:field="*{pays}" />
+    <div th:if="${#fields.hasErrors('pays')}" th:errors="*{pays}" class="error"></div>
+
+    <label for="ville">Ville :</label>
+    <input type="text" id="ville" th:field="*{ville}" />
+    <div th:if="${#fields.hasErrors('ville')}" th:errors="*{ville}" class="error"></div>
+
+    <label for="telephone">Téléphone :</label>
+    <input type="text" id="telephone" th:field="*{telephone}" />
+    <div th:if="${#fields.hasErrors('telephone')}" th:errors="*{telephone}" class="error"></div>
+
+    <label for="newPassword">Nouveau mot de passe :</label>
+    <input type="password" id="newPassword" th:field="*{newPassword}" autocomplete="new-password" />
+    <div th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}" class="error"></div>
+
+    <label for="confirmPassword">Confirmer le mot de passe :</label>
+    <input type="password" id="confirmPassword" th:field="*{confirmPassword}" autocomplete="new-password" />
+    <div th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error"></div>
+
+    <button type="submit">Enregistrer les modifications</button>
+</form>
+
+<a href="/user/profile" class="back-link">← Retour au profil</a>
+
+</body>
+</html>
