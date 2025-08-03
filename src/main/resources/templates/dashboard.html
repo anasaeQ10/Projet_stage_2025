@@ -178,15 +178,15 @@
             <!-- Section utilisateur connecté -->
             <div class="d-flex align-items-center">
                 <!-- Affichage du nom -->
-                <span class="me-3" sec:authorize="isAuthenticated()">
-                    Bienvenue, <strong sec:authentication="name">Admin</strong>
+                <span class="me-3" th:if="${currentUser}">
+                    Bienvenue, <strong th:text="${currentUser.nom + ' ' + currentUser.prenom}">Utilisateur</strong>
                 </span>
 
                 <!-- Avatar avec menu déroulant -->
                 <div class="dropdown">
                     <div class="user-avatar dropdown-toggle" id="userDropdown"
                          data-bs-toggle="dropdown" aria-expanded="false"
-                         sec:authentication="principal.username.substring(0,1)">A</div>
+                         th:text="${currentUser.nom.substring(0,1) + currentUser.prenom.substring(0,1)}">A</div>
 
                     <!-- Menu déroulant -->
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
