@@ -1,64 +1,220 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
 <head>
     <meta charset="UTF-8" />
     <title>Profil utilisateur</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 0 20px; }
-        h1 { color: #2c3e50; }
-        .profile-info { margin-top: 20px; }
-        .profile-info dt { font-weight: bold; }
-        .profile-info dd { margin: 0 0 10px 0; }
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --primary-hover: #3a5bc7;
+            --success: #1cc88a;
+            --success-light: #d1fae5;
+            --danger: #e74a3b;
+            --danger-light: #f8d7da;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --lighter: #ffffff;
+            --border: #e3e6f0;
+            --text-muted: #6c757d;
+            --text-dark: #343a40;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-container {
+            background-color: var(--lighter);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #a2c0f9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-right: 1.5rem;
+        }
+
+        .profile-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .profile-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            margin: 0;
+        }
+
         .btn-edit {
-            display: inline-block;
-            padding: 8px 16px;
-            background-color: #2980b9;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 2rem;
         }
+
+        .btn-edit:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.3);
+            color: white;
+        }
+
         .alert {
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
         }
-        .alert-success { background-color: #d4edda; color: #155724; }
-        .alert-danger { background-color: #f8d7da; color: #721c24; }
+
+        .alert-success {
+            background-color: var(--success-light);
+            border-left-color: var(--success);
+            color: var(--dark);
+        }
+
+        .alert-danger {
+            background-color: var(--danger-light);
+            border-left-color: var(--danger);
+            color: var(--dark);
+        }
+
+        .alert-icon {
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
 
-<h1>Mon profil</h1>
+<div layout:fragment="content" class="container">
+    <div class="profile-container">
+        <!-- Messages flash -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <i class="fas fa-check-circle alert-icon"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle alert-icon"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
 
-<!-- Messages flash -->
-<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <div class="profile-header">
+            <div class="profile-avatar" th:text="${userInfo.prenom.substring(0,1) + userInfo.nom.substring(0,1)}"></div>
+            <div>
+                <h1 class="profile-title" th:text="${userInfo.prenom + ' ' + userInfo.nom}"></h1>
+                <p class="profile-subtitle">Profil utilisateur</p>
+            </div>
+        </div>
 
-<dl class="profile-info">
-    <dt>Prénom :</dt>
-    <dd th:text="${userInfo.prenom}">Prénom</dd>
+        <div class="profile-info">
+            <div class="info-card">
+                <div class="info-label">Email</div>
+                <p class="info-value" th:text="${userInfo.email}">email@example.com</p>
+            </div>
 
-    <dt>Nom :</dt>
-    <dd th:text="${userInfo.nom}">Nom</dd>
+            <div class="info-card">
+                <div class="info-label">Adresse</div>
+                <p class="info-value" th:text="${userInfo.adresse} ?: 'Non renseignée'">123 Rue Exemple</p>
+            </div>
 
-    <dt>Email :</dt>
-    <dd th:text="${userInfo.email}">email@example.com</dd>
+            <div class="info-card">
+                <div class="info-label">Ville</div>
+                <p class="info-value" th:text="${userInfo.ville} ?: 'Non renseignée'">Paris</p>
+            </div>
 
-    <dt>Adresse :</dt>
-    <dd th:text="${userInfo.adresse}">Adresse</dd>
+            <div class="info-card">
+                <div class="info-label">Pays</div>
+                <p class="info-value" th:text="${userInfo.pays} ?: 'Non renseigné'">France</p>
+            </div>
 
-    <dt>Pays :</dt>
-    <dd th:text="${userInfo.pays}">Pays</dd>
+            <div class="info-card">
+                <div class="info-label">Téléphone</div>
+                <p class="info-value" th:text="${userInfo.telephone} ?: 'Non renseigné'">+33 1 23 45 67 89</p>
+            </div>
+        </div>
 
-    <dt>Ville :</dt>
-    <dd th:text="${userInfo.ville}">Ville</dd>
-
-    <dt>Téléphone :</dt>
-    <dd th:text="${userInfo.telephone}">Téléphone</dd>
-</dl>
-
-<a href="/user/profile/edit" class="btn-edit">Modifier mon profil</a>
+        <a href="/user/profile/edit" class="btn-edit">
+            <i class="fas fa-edit me-2"></i> Modifier mon profil
+        </a>
+    </div>
+</div>
 
 </body>
 </html>

@@ -1,108 +1,372 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
 <head>
     <meta charset="UTF-8" />
     <title>Modifier mon profil</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 0 20px; }
-        h1 { color: #2c3e50; margin-bottom: 20px; }
-        form { display: flex; flex-direction: column; }
-        label {
-            margin-top: 10px;
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --primary-hover: #3a5bc7;
+            --success: #1cc88a;
+            --success-light: #d1fae5;
+            --danger: #e74a3b;
+            --danger-light: #f8d7da;
+            --warning: #f6c23e;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --lighter: #ffffff;
+            --border: #e3e6f0;
+            --text-muted: #6c757d;
+            --text-dark: #343a40;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-form-container {
+            background-color: var(--lighter);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #a2c0f9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
             font-weight: bold;
+            margin-right: 1.5rem;
         }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
-            padding: 8px;
-            font-size: 1em;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        .profile-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
         }
-        .error {
-            color: #b00020;
-            font-size: 0.9em;
-            margin-top: 2px;
+
+        .profile-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 0.25rem;
         }
-        button {
-            margin-top: 20px;
-            background-color: #2980b9;
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s;
+            background-color: var(--lighter);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            outline: none;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error-message i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 10px;
-            font-size: 1em;
-            border-radius: 5px;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.3);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .alert-success {
+            background-color: var(--success-light);
+            border-left-color: var(--success);
+            color: var(--text-dark);
+        }
+
+        .alert-danger {
+            background-color: var(--danger-light);
+            border-left-color: var(--danger);
+            color: var(--text-dark);
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
             cursor: pointer;
         }
-        button:hover {
-            background-color: #1f6391;
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
-        .alert {
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        .alert-success { background-color: #d4edda; color: #155724; }
-        .alert-danger { background-color: #f8d7da; color: #721c24; }
-        .back-link {
-            margin-top: 10px;
-            text-decoration: none;
-            color: #2980b9;
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-form-container {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
 
-<h1>Modifier mon profil</h1>
+<div layout:fragment="content" class="container">
+    <div class="profile-form-container">
+        <!-- Messages flash -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <i class="fas fa-check-circle alert-icon"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle alert-icon"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
 
-<!-- Messages flash -->
-<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <div class="profile-header">
+            <div class="profile-avatar" th:text="${userForm.prenom.substring(0,1) + userForm.nom.substring(0,1)}"></div>
+            <div>
+                <h1 class="profile-title">Modifier mon profil</h1>
+                <p class="profile-subtitle">Mettez à jour vos informations personnelles</p>
+            </div>
+        </div>
 
-<form th:action="@{/user/profile/update}" th:object="${userForm}" method="post" novalidate>
+        <form th:action="@{/user/profile/update}" th:object="${userForm}" method="post" novalidate>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="prenom" class="form-label">Prénom</label>
+                    <input type="text" id="prenom" th:field="*{prenom}" class="form-control" />
+                    <div th:if="${#fields.hasErrors('prenom')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{prenom}"></span>
+                    </div>
+                </div>
 
-    <label for="prenom">Prénom :</label>
-    <input type="text" id="prenom" th:field="*{prenom}" />
-    <div th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}" class="error"></div>
+                <div class="form-group">
+                    <label for="nom" class="form-label">Nom</label>
+                    <input type="text" id="nom" th:field="*{nom}" class="form-control" />
+                    <div th:if="${#fields.hasErrors('nom')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{nom}"></span>
+                    </div>
+                </div>
 
-    <label for="nom">Nom :</label>
-    <input type="text" id="nom" th:field="*{nom}" />
-    <div th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}" class="error"></div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" th:field="*{email}" class="form-control" />
+                    <div th:if="${#fields.hasErrors('email')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{email}"></span>
+                    </div>
+                </div>
 
-    <label for="email">Email :</label>
-    <input type="email" id="email" th:field="*{email}" />
-    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></div>
+                <div class="form-group">
+                    <label for="telephone" class="form-label">Téléphone</label>
+                    <input type="text" id="telephone" th:field="*{telephone}" class="form-control" />
+                    <div th:if="${#fields.hasErrors('telephone')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{telephone}"></span>
+                    </div>
+                </div>
 
-    <label for="adresse">Adresse :</label>
-    <input type="text" id="adresse" th:field="*{adresse}" />
-    <div th:if="${#fields.hasErrors('adresse')}" th:errors="*{adresse}" class="error"></div>
+                <div class="form-group">
+                    <label for="adresse" class="form-label">Adresse</label>
+                    <input type="text" id="adresse" th:field="*{adresse}" class="form-control" />
+                    <div th:if="${#fields.hasErrors('adresse')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{adresse}"></span>
+                    </div>
+                </div>
 
-    <label for="pays">Pays :</label>
-    <input type="text" id="pays" th:field="*{pays}" />
-    <div th:if="${#fields.hasErrors('pays')}" th:errors="*{pays}" class="error"></div>
+                <div class="form-group">
+                    <label for="ville" class="form-label">Ville</label>
+                    <input type="text" id="ville" th:field="*{ville}" class="form-control" />
+                    <div th:if="${#fields.hasErrors('ville')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{ville}"></span>
+                    </div>
+                </div>
 
-    <label for="ville">Ville :</label>
-    <input type="text" id="ville" th:field="*{ville}" />
-    <div th:if="${#fields.hasErrors('ville')}" th:errors="*{ville}" class="error"></div>
+                <div class="form-group">
+                    <label for="pays" class="form-label">Pays</label>
+                    <input type="text" id="pays" th:field="*{pays}" class="form-control" />
+                    <div th:if="${#fields.hasErrors('pays')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{pays}"></span>
+                    </div>
+                </div>
+            </div>
 
-    <label for="telephone">Téléphone :</label>
-    <input type="text" id="telephone" th:field="*{telephone}" />
-    <div th:if="${#fields.hasErrors('telephone')}" th:errors="*{telephone}" class="error"></div>
+            <h3 style="margin: 2rem 0 1rem; color: var(--dark);">Changer le mot de passe</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Laissez vide pour conserver le mot de passe actuel</p>
 
-    <label for="newPassword">Nouveau mot de passe :</label>
-    <input type="password" id="newPassword" th:field="*{newPassword}" autocomplete="new-password" />
-    <div th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}" class="error"></div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="newPassword" class="form-label">Nouveau mot de passe</label>
+                    <div class="password-container">
+                        <input type="password" id="newPassword" th:field="*{newPassword}" class="form-control" autocomplete="new-password" />
+                        <button type="button" class="password-toggle" onclick="togglePassword('newPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div th:if="${#fields.hasErrors('newPassword')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{newPassword}"></span>
+                    </div>
+                </div>
 
-    <label for="confirmPassword">Confirmer le mot de passe :</label>
-    <input type="password" id="confirmPassword" th:field="*{confirmPassword}" autocomplete="new-password" />
-    <div th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error"></div>
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
+                    <div class="password-container">
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control" autocomplete="new-password" />
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div th:if="${#fields.hasErrors('confirmPassword')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{confirmPassword}"></span>
+                    </div>
+                </div>
+            </div>
 
-    <button type="submit">Enregistrer les modifications</button>
-</form>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Enregistrer les modifications
+            </button>
+        </form>
 
-<a href="/user/profile" class="back-link">← Retour au profil</a>
+        <a href="/user/profile" class="back-link">
+            <i class="fas fa-arrow-left"></i> Retour au profil
+        </a>
+    </div>
+</div>
+
+<script>
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        const icon = input.nextElementSibling.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
 
 </body>
 </html>

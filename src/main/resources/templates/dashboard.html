@@ -214,9 +214,9 @@
                     </div>
 
                     <!-- Bouton d'ajout -->
-                    <button class="btn btn-primary d-flex align-items-center">
+                    <a th:href="@{/admin/users/new}" class="btn btn-primary d-flex align-items-center">
                         <i class="fas fa-plus me-2"></i>Nouvel Utilisateur
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -273,11 +273,13 @@
                                    data-bs-toggle="tooltip" title="Modifier">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <button class="btn btn-sm btn-outline-danger action-btn"
-                                        data-bs-toggle="tooltip" title="Supprimer"
-                                        onclick="confirmDelete('${user.id}', '${user.nom}')">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger action-btn"
+                                            data-bs-toggle="tooltip" title="Supprimer"
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -316,19 +318,29 @@
             Swal.fire({
                 title: 'Confirmer la suppression',
                 html: `Êtes-vous sûr de vouloir supprimer <b>${name}</b> ?`,
-                icon: 'question',
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Supprimer',
-                cancelButtonText: 'Annuler',
-                backdrop: 'rgba(0,0,0,0.1)'
+                cancelButtonText: 'Annuler'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Ajouter ici la logique de suppression
+                    fetch(`/admin/users/delete/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                Swal.fire('Supprimé !', 'Utilisateur supprimé.', 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Erreur', 'Impossible de supprimer cet utilisateur.', 'error');
+                            }
+                        });
                 }
             });
         }
+
     </script>
 
 

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Détails de l'utilisateur | Tableau de Bord</title>
+    <style>
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --lighter: #ffffff;
+            --border: #e3e6f0;
+            --text-muted: #6c757d;
+            --success: #1cc88a;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .user-profile-card {
+            background-color: var(--lighter);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .user-profile-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #6c8ef5 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-profile-body {
+            padding: 2rem;
+        }
+
+        .detail-item {
+            display: flex;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark);
+            min-width: 180px;
+        }
+
+        .detail-value {
+            color: var(--text-muted);
+            flex: 1;
+        }
+
+        .badge-role {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-back {
+            border-radius: 8px;
+            padding: 0.625rem 1.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+            border: 1px solid var(--border);
+        }
+
+        .btn-back:hover {
+            background-color: var(--light);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .detail-item {
+                flex-direction: column;
+            }
+
+            .detail-label {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content" class="container py-5">
+    <div class="user-profile-card">
+        <!-- En-tête avec avatar -->
+        <div class="user-profile-header">
+            <div class="user-avatar" th:text="${user.nom.substring(0,1) + user.prenom.substring(0,1)}"></div>
+            <h2 th:text="${user.nom + ' ' + user.prenom}"></h2>
+            <div class="mt-2">
+                <span class="badge-role" th:text="${user.role == 'ROLE_ADMIN' ? 'Administrateur' : 'Utilisateur'}"></span>
+            </div>
+        </div>
+
+        <!-- Corps avec les détails -->
+        <div class="user-profile-body">
+            <div class="detail-item">
+                <div class="detail-label">Nom complet</div>
+                <div class="detail-value" th:text="${user.nom + ' ' + user.prenom}"></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Email</div>
+                <div class="detail-value" th:text="${user.email}"></div>
+            </div>
+
+            <div class="detail-item" th:if="${user.matricule != null}">
+                <div class="detail-label">Matricule</div>
+                <div class="detail-value" th:text="${user.matricule}"></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Date d'embauche</div>
+                <div class="detail-value" th:text="${#temporals.format(user.dateEmbauche, 'dd/MM/yyyy')}"></div>
+            </div>
+
+            <div class="mt-4 pt-3 text-center border-top">
+                <a th:href="@{/dashboard}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

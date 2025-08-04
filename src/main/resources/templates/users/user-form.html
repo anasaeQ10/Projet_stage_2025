@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Formulaire Utilisateur | Tableau de Bord</title>
+    <style>
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --primary-hover: #3a5bc7;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --lighter: #ffffff;
+            --border: #e3e6f0;
+            --text-muted: #6c757d;
+            --text-dark: #343a40;
+        }
+
+        /* Container amélioré */
+        .form-container {
+            background-color: var(--lighter);
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* En-tête de formulaire */
+        .form-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        /* Champs de formulaire */
+        .form-label {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Boutons */
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            border-radius: 10px;
+            padding: 0.625rem 1.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--text-muted);
+            border: none;
+            border-radius: 10px;
+            padding: 0.625rem 1.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+        }
+
+        /* Avatar preview */
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #a2c0f9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-container {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container-fluid py-4">
+        <div class="form-container">
+            <!-- En-tête du formulaire -->
+            <div class="form-header">
+                <h2 class="h4 mb-0 text-gray-800 fw-bold">
+                    <i class="fas fa-user me-2 text-primary"></i>
+                    <span th:text="${user.id != null} ? 'Modifier Utilisateur' : 'Nouvel Utilisateur'"></span>
+                </h2>
+            </div>
+
+            <!-- Avatar preview -->
+            <div class="text-center mb-4" th:if="${user.nom != null and user.prenom != null}">
+                <div class="avatar-preview"
+                     th:text="${user.nom.substring(0,1) + user.prenom.substring(0,1)}"></div>
+                <h5 class="fw-bold" th:text="${user.nom + ' ' + user.prenom}"></h5>
+            </div>
+
+            <!-- Formulaire -->
+            <form th:action="@{/admin/users/save}" th:object="${user}" method="post">
+                <input type="hidden" th:field="*{id}"/>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="form-label">Nom</label>
+                        <input type="text" th:field="*{nom}" class="form-control" required/>
+                        <small class="text-muted">Le nom de famille de l'utilisateur</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Prénom</label>
+                        <input type="text" th:field="*{prenom}" class="form-control" required/>
+                        <small class="text-muted">Le prénom de l'utilisateur</small>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Email</label>
+                    <input type="email" th:field="*{email}" class="form-control" required/>
+                    <small class="text-muted">L'adresse email doit être unique</small>
+                </div>
+
+                <div class="mb-4" th:if="${user.id == null}">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" th:field="*{password}" class="form-control" required minlength="8"/>
+                    <small class="text-muted">Minimum 8 caractères</small>
+                </div>
+
+                <div class="mb-4" th:unless="${user.id == null}">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" value="********" disabled/>
+                    <small class="text-muted">Le mot de passe ne peut pas être modifié ici</small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Rôle</label>
+                    <select th:field="*{role}" class="form-select">
+                        <option value="ROLE_USER">Utilisateur</option>
+                        <option value="ROLE_ADMIN">Administrateur</option>
+                    </select>
+                </div>
+
+                <div class="form-footer">
+                    <a th:href="@{/dashboard}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
