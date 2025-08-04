@@ -63,6 +63,36 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 | 3 | Rapports & tableau de bord | 25/08/2025 |
 | 4 | Tests finaux & améliorations | 01/09/2025 |
 
+## ▶️ Lancement du projet
+
+### Prérequis
+
+- Java 17+
+- Maven
+- MySQL (MAMP,XAMP,...)
+
+### Étapes
+
+1. Cloner le dépôt :
+   ```bash
+   git clone https://github.com/anasaeQ10/Projet_stage_2025.git
+   cd vulnerabilityscanner
+2. Configurer la base de données dans "src/main/resources/application.properties" :
+
+   ```bash
+   spring.datasource.url=jdbc:mysql://localhost:3306/nom_de_la_base
+   spring.datasource.username=utilisateur
+   spring.datasource.password=mot_de_passe
+
+3. Lancer l’application :
+   ```bash
+   ./mvnw spring-boot:run
+
+4. Accéder à l'application :
+   ```bash 
+   http://localhost:8080/login
+
+
 ## 🔒 Contraintes
 
 - Délai court (sprints hebdomadaires)
