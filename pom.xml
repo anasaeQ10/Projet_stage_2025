@@ -8,11 +8,11 @@
         <version>3.4.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.apppfa</groupId>
-    <artifactId>pfaapp4iir</artifactId>
+    <groupId>com.vulnerabilityscanne</groupId>
+    <artifactId>vscanner</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>pfaapp4iir</name>
-    <description>pfaapp4iir</description>
+    <name>vscanner</name>
+    <description>vscanner</description>
     <url/>
     <licenses>
         <license/>
@@ -95,6 +95,27 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
+
+        <!-- Version sécurisée de POI -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Version sécurisée de Commons IO -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

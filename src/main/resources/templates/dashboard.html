@@ -190,6 +190,20 @@
             margin-bottom: 1rem;
             color: #e9ecef;
         }
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+            border-radius: 10px;
+            padding: 0.625rem 1.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -216,6 +230,10 @@
                     <!-- Bouton d'ajout -->
                     <a th:href="@{/admin/users/new}" class="btn btn-primary d-flex align-items-center">
                         <i class="fas fa-plus me-2"></i>Nouvel Utilisateur
+                    </a>
+
+                    <a th:href="@{/admin/users/export}" class="btn btn-success d-flex align-items-center">
+                        <i class="fas fa-file-excel me-2"></i>Exporter Rapport
                     </a>
                 </div>
             </div>
