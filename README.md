@@ -45,7 +45,7 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 
 ## 🛠️ Stack technique (proposée)
 
-- **Frontend** : Spring MVC
+- **Frontend** : Spring MVC, Thymeleaf
 - **Backend** : java JEE SpringBoot
 - **Base de données** : MySql
 - **API vulnérabilités** : NVD
