@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Recherche Vulnérabilités</title></head>
+<body>
+<h1>Recherche vulnérabilités NVD</h1>
+<form th:action="@{/vulnerabilities/search}" method="get">
+    <input type="text" name="keyword" placeholder="Mot clé"/>
+    <button type="submit">Rechercher</button>
+</form>
+<p th:text="${message}"></p>
+</body>
+</html>
