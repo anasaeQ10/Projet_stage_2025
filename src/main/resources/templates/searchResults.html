@@ -1,52 +1,133 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
 <head>
-    <meta charset="UTF-8" />
-    <title>Résultats de la recherche</title>
+    <title>Résultats de la recherche CVE</title>
     <style>
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --primary-hover: #3a5bc7;
+            --border: #e3e6f0;
+            --text-dark: #343a40;
+            --text-muted: #6c757d;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 2rem;
+            color: var(--text-dark);
         }
-        h1 {
-            color: #333;
+
+        h2 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
         }
-        pre {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border: 1px solid #ddd;
-            max-height: 400px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
-        .message {
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #fdd;
-            border: 1px solid #f99;
-            color: #900;
+
+        thead {
+            background-color: var(--primary);
+            color: white;
         }
-        a {
+
+        th, td {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background-color: var(--primary-light);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                display: none;
+            }
+            tbody tr {
+                margin-bottom: 1rem;
+                background: white;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+                border-radius: 12px;
+                padding: 1rem;
+            }
+            tbody td {
+                padding: 0.5rem 1rem;
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                text-align: left;
+            }
+            tbody td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                font-weight: 700;
+                color: var(--primary);
+            }
+        }
+
+        a.new-search {
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 1.5rem;
+            padding: 0.5rem 1.25rem;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 10px;
             text-decoration: none;
-            color: #007bff;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
         }
-        a:hover {
-            text-decoration: underline;
+
+        a.new-search:hover {
+            background-color: var(--primary-hover);
         }
     </style>
 </head>
 <body>
-<h1>Résultats pour : <span th:text="${keyword}">mot-clé</span></h1>
+<div layout:fragment="content">
+<h2>Résultats pour : "<span th:text="${keyword}"></span>"</h2>
 
-<!-- Afficher un message d'erreur ou d'info s'il y en a -->
-<div th:if="${message}" class="message" th:text="${message}"></div>
+<table>
+    <thead>
+    <tr>
+        <th>CVE ID</th>
+        <th>Description</th>
+        <th>Date de publication</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${cveItems}">
+        <td data-label="CVE ID" th:text="${item.cve.id}">CVE-ID</td>
+        <td data-label="Description" th:text="${item.englishDescription}">Description</td>
+        <td data-label="Date de publication" th:text="${item.published}">Date</td>
+    </tr>
+    </tbody>
+</table>
 
-<!-- Afficher les résultats uniquement s'ils existent -->
-<pre th:if="${results}" th:text="${results}"></pre>
-
-<a href="/vulnerabilities/search">← Nouvelle recherche</a>
+<a th:href="@{/search}" class="new-search">Nouvelle recherche</a>
+</div>
 </body>
 </html>
