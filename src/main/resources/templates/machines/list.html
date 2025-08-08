@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Liste des Machines</title>
+    <style>
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --primary-hover: #3a5bc7;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --lighter: #ffffff;
+            --border: #e3e6f0;
+            --text-muted: #6c757d;
+            --text-dark: #343a40;
+            --danger: #e74a3b;
+            --danger-hover: #be2c24;
+        }
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            margin: 2rem;
+        }
+        .dashboard-container {
+            background-color: var(--lighter);
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            max-width: 1200px;
+            margin: auto;
+        }
+        h2 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+        a.btn-primary {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.6rem 1.3rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        a.btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(78, 115, 223, 0.3);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--lighter);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        thead {
+            background-color: var(--primary);
+            color: white;
+        }
+        thead th {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            user-select: none;
+        }
+        tbody tr {
+            transition: background-color 0.3s ease;
+            cursor: default;
+        }
+        tbody tr:nth-child(even) {
+            background-color: var(--primary-light);
+        }
+        tbody tr:hover {
+            background-color: rgba(78, 115, 223, 0.1);
+        }
+        tbody td {
+            padding: 1rem 1.5rem;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border);
+        }
+        tbody td:last-child {
+            white-space: nowrap;
+        }
+        /* Actions liens */
+        tbody a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            margin: 0 0.3rem;
+            padding: 0.3rem 0.5rem;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        tbody a:hover {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+        tbody a.delete {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+        tbody a.delete:hover {
+            background-color: var(--danger);
+            color: white;
+            border-color: var(--danger-hover);
+        }
+        tbody a.btn-details {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        tbody a.btn-details:hover {
+            background-color: #17a673;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="dashboard-container">
+    <h2>Machines du système d’information</h2>
+    <a th:href="@{/machines/add}" class="btn-primary">Ajouter une machine</a>
+    <a th:href="@{/machines/export}" class="btn btn-success d-flex align-items-center">
+        <i class="fas fa-file-excel me-2"></i>Exporter Rapport
+    </a>
+    <table>
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Type</th>
+            <th>Fabricant</th>
+            <th>Modèle</th>
+            <th>Adresse IP</th>
+            <th>Système d’exploitation</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="machine : ${machines}">
+            <td th:text="${machine.name}"></td>
+            <td th:text="${machine.type}"></td>
+            <td th:text="${machine.manufacturer}"></td>
+            <td th:text="${machine.model}"></td>
+            <td th:text="${machine.ipAddress}"></td>
+            <td th:text="${machine.operatingSystem}"></td>
+            <td>
+                <a th:href="@{'/machines/edit/' + ${machine.id}}" class="edit">Modifier</a> |
+                <a th:href="@{'/machines/' + ${machine.id}}" class="btn-details">Détails</a> |
+                <a th:href="@{'/machines/delete/' + ${machine.id}}" class="delete" onclick="return confirm('Supprimer cette machine ?');">Supprimer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

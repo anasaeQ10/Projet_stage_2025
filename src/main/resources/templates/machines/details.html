@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Détails de la machine</title>
+    <style>
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --primary-hover: #3a5bc7;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --lighter: #ffffff;
+            --border: #e3e6f0;
+            --text-muted: #6c757d;
+            --text-dark: #343a40;
+            --success: #1cc88a;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+        }
+
+        .details-container {
+            background-color: var(--lighter);
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            max-width: 1000px;
+            margin: 2rem auto;
+        }
+
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .details-title {
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .details-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.3rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(78, 115, 223, 0.3);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c53020;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .details-section {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+
+        .detail-value.empty {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .details-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="details-container">
+        <div class="details-header">
+            <h1 class="details-title">Détails de la machine: <span th:text="${machine.name}"></span></h1>
+            <div class="details-actions">
+                <a th:href="@{'/machines/edit/' + ${machine.id}}" class="btn btn-primary">Modifier</a>
+                <a th:href="@{'/machines/delete/' + ${machine.id}}" class="btn btn-danger"
+                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette machine ?');">Supprimer</a>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <!-- Section Identité -->
+            <div class="details-section">
+                <h2 class="section-title">Identité</h2>
+                <div class="detail-item">
+                    <span class="detail-label">Type</span>
+                    <span class="detail-value" th:text="${machine.type} ?: 'Non spécifié'"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Fabricant</span>
+                    <span class="detail-value" th:text="${machine.manufacturer} ?: 'Non spécifié'"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Modèle</span>
+                    <span class="detail-value" th:text="${machine.model} ?: 'Non spécifié'"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Numéro de série</span>
+                    <span class="detail-value" th:text="${machine.serialNumber} ?: 'Non spécifié'"></span>
+                </div>
+            </div>
+
+            <!-- Section Réseau -->
+            <div class="details-section">
+                <h2 class="section-title">Réseau</h2>
+                <div class="detail-item">
+                    <span class="detail-label">Adresse IP</span>
+                    <span class="detail-value" th:text="${machine.ipAddress} ?: 'Non spécifié'"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Adresse MAC</span>
+                    <span class="detail-value" th:text="${machine.macAddress} ?: 'Non spécifié'"></span>
+                </div>
+            </div>
+
+            <!-- Section Matériel -->
+            <div class="details-section">
+                <h2 class="section-title">Matériel</h2>
+                <div class="detail-item">
+                    <span class="detail-label">Processeur</span>
+                    <span class="detail-value" th:text="${machine.cpu} ?: 'Non spécifié'"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Mémoire RAM</span>
+                    <span class="detail-value" th:text="${machine.ramGb} + ' Go' ?: 'Non spécifié'"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Stockage</span>
+                    <span class="detail-value" th:text="${machine.storageGb} + ' Go' ?: 'Non spécifié'"></span>
+                </div>
+            </div>
+
+            <!-- Section Logiciel -->
+            <div class="details-section">
+                <h2 class="section-title">Logiciel</h2>
+                <div class="detail-item">
+                    <span class="detail-label">Système d'exploitation</span>
+                    <span class="detail-value" th:text="${machine.operatingSystem} ?: 'Non spécifié'"></span>
+                </div>
+            </div>
+
+            <!-- Section Localisation -->
+            <div class="details-section">
+                <h2 class="section-title">Localisation</h2>
+                <div class="detail-item">
+                    <span class="detail-label">Emplacement physique</span>
+                    <span class="detail-value" th:text="${machine.location} ?: 'Non spécifié'"></span>
+                </div>
+            </div>
+
+            <!-- Section Dates -->
+            <div class="details-section">
+                <h2 class="section-title">Dates importantes</h2>
+                <div class="detail-item">
+                    <span class="detail-label">Date d'achat</span>
+                    <span class="detail-value" th:text="${machine.purchaseDate} ?: 'Non spécifié'"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Fin de garantie</span>
+                    <span class="detail-value" th:text="${machine.warrantyExpiryDate} ?: 'Non spécifié'"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="details-section" style="grid-column: 1 / -1; margin-top: 1rem;">
+            <h2 class="section-title">Description</h2>
+            <div class="detail-item">
+                <p class="detail-value" th:if="${machine.description}" th:text="${machine.description}"></p>
+                <p class="detail-value empty" th:unless="${machine.description}">Aucune description fournie</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a th:href="@{/machines}" class="btn btn-primary">Retour à la liste</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

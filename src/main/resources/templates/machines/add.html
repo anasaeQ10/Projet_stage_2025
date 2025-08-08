@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Ajouter une machine</title>
+    <style>
+        :root {
+            --primary: #4e73df;
+            --primary-light: #e8f0fe;
+            --primary-hover: #3a5bc7;
+            --success: #1cc88a;
+            --success-hover: #17a673;
+            --light: #f8f9fa;
+            --lighter: #ffffff;
+            --border: #e3e6f0;
+            --text-muted: #6c757d;
+            --text-dark: #343a40;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.05);
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: var(--lighter);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            grid-column: 1 / -1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(28, 200, 138, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--light);
+            color: var(--text-dark);
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #e74a3b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Tooltip pour les champs */
+        .info-tooltip {
+            display: inline-block;
+            margin-left: 0.5rem;
+            color: var(--text-muted);
+            cursor: help;
+            position: relative;
+        }
+
+        .info-tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--text-dark);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="form-container">
+        <div class="form-header">
+            <h2>Ajouter une nouvelle machine</h2>
+            <p>Remplissez les détails de la machine à ajouter à l'inventaire</p>
+        </div>
+
+        <form th:action="@{/machines/add}" th:object="${machine}" method="post">
+            <div class="form-grid">
+                <!-- Section Identité -->
+                <div class="form-group">
+                    <label class="required-field">Nom</label>
+                    <input type="text" class="form-control" th:field="*{name}" required
+                           placeholder="Ex: Serveur principal">
+                </div>
+
+                <div class="form-group">
+                    <label class="required-field">Type</label>
+                    <input type="text" class="form-control" th:field="*{type}" required
+                           placeholder="Ex: Serveur, PC, Switch">
+                </div>
+
+                <div class="form-group">
+                    <label>Fabricant</label>
+                    <input type="text" class="form-control" th:field="*{manufacturer}"
+                           placeholder="Ex: Dell, HP, Cisco">
+                </div>
+
+                <div class="form-group">
+                    <label>Modèle</label>
+                    <input type="text" class="form-control" th:field="*{model}"
+                           placeholder="Ex: PowerEdge R740">
+                </div>
+
+                <div class="form-group">
+                    <label>Numéro de série</label>
+                    <input type="text" class="form-control" th:field="*{serialNumber}"
+                           placeholder="Ex: ABC123456789">
+                </div>
+
+                <!-- Section Réseau -->
+                <div class="form-group">
+                    <label>Adresse IP</label>
+                    <input type="text" class="form-control" th:field="*{ipAddress}"
+                           placeholder="Ex: 192.168.1.1">
+                </div>
+
+                <div class="form-group">
+                    <label>Adresse MAC</label>
+                    <input type="text" class="form-control" th:field="*{macAddress}"
+                           placeholder="Ex: 00:1A:2B:3C:4D:5E">
+                </div>
+
+                <!-- Section Matériel -->
+                <div class="form-group">
+                    <label>Système d'exploitation</label>
+                    <input type="text" class="form-control" th:field="*{operatingSystem}"
+                           placeholder="Ex: Windows Server 2019">
+                </div>
+
+                <div class="form-group">
+                    <label>Processeur</label>
+                    <input type="text" class="form-control" th:field="*{cpu}"
+                           placeholder="Ex: Intel Xeon E5-2678">
+                </div>
+
+                <div class="form-group">
+                    <label>RAM (Go)</label>
+                    <input type="number" class="form-control" th:field="*{ramGb}" min="0"
+                           placeholder="Ex: 32">
+                </div>
+
+                <div class="form-group">
+                    <label>Stockage (Go)</label>
+                    <input type="number" class="form-control" th:field="*{storageGb}" min="0"
+                           placeholder="Ex: 1000">
+                </div>
+
+                <!-- Section Dates -->
+                <div class="form-group">
+                    <label>Date d'achat</label>
+                    <input type="date" class="form-control" th:field="*{purchaseDate}">
+                </div>
+
+                <div class="form-group">
+                    <label>Fin de garantie</label>
+                    <input type="date" class="form-control" th:field="*{warrantyExpiryDate}">
+                </div>
+
+                <div class="form-group">
+                    <label>Localisation</label>
+                    <input type="text" class="form-control" th:field="*{location}"
+                           placeholder="Ex: Salle serveurs, Rack 3">
+                </div>
+
+                <!-- Description -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Description</label>
+                    <textarea class="form-control" th:field="*{description}"
+                              placeholder="Décrivez cette machine..."></textarea>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <a th:href="@{/machines}" class="btn btn-outline">
+                        Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        Ajouter la machine
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
