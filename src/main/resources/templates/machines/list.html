@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title>Liste des Machines</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <title>Machines | Tableau de Bord</title>
     <style>
         :root {
             --primary: #4e73df;
@@ -17,95 +19,179 @@
             --text-dark: #343a40;
             --danger: #e74a3b;
             --danger-hover: #be2c24;
+            --success: #28a745;
+            --success-hover: #218838;
         }
+
         body {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light);
             margin: 2rem;
         }
+
         .dashboard-container {
             background-color: var(--lighter);
             border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
             padding: 2rem;
             border: 1px solid var(--border);
             max-width: 1200px;
             margin: auto;
         }
-        h2 {
-            color: var(--dark);
-            margin-bottom: 1rem;
+
+        /* Header avec titre + boutons alignés */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
-        a.btn-primary {
-            display: inline-block;
+
+        .header h2 {
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+
+        /* Boutons d'action principaux */
+        .btn-primary, .btn-success {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            border-radius: 10px;
+            padding: 0.625rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
             background-color: var(--primary);
             color: white;
-            padding: 0.6rem 1.3rem;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        a.btn-primary:hover {
+        .btn-primary:hover {
             background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(78, 115, 223, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.2);
         }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        }
+
+        /* Table améliorée */
         table {
             width: 100%;
-            border-collapse: collapse;
-            background: var(--lighter);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-            border-radius: 12px;
-            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            font-size: 0.9rem;
         }
-        thead {
+
+        thead tr {
             background-color: var(--primary);
             color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            display: table;
+            width: 100%;
+            table-layout: fixed;
         }
+
         thead th {
             padding: 1rem 1.5rem;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.8rem;
             letter-spacing: 0.05em;
             user-select: none;
+            text-align: left;
         }
+
+        tbody {
+            display: block;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
         tbody tr {
+            background-color: var(--lighter);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            margin-bottom: 8px;
+            border-radius: 12px;
+            display: table;
+            width: 100%;
+            table-layout: fixed;
             transition: background-color 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background-color: var(--primary-light);
             cursor: default;
         }
-        tbody tr:nth-child(even) {
-            background-color: var(--primary-light);
-        }
-        tbody tr:hover {
-            background-color: rgba(78, 115, 223, 0.1);
-        }
+
         tbody td {
             padding: 1rem 1.5rem;
+            border-bottom: none;
             color: var(--text-dark);
-            border-bottom: 1px solid var(--border);
-        }
-        tbody td:last-child {
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        tbody td.actions {
+            white-space: nowrap;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-start;
+        }
+
         /* Actions liens */
         tbody a {
-            color: var(--primary);
             font-weight: 600;
-            text-decoration: none;
-            margin: 0 0.3rem;
-            padding: 0.3rem 0.5rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 8px;
             border: 1px solid transparent;
+            text-decoration: none;
+            font-size: 0.85rem;
             transition: all 0.2s ease;
-            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
         }
-        tbody a:hover {
+
+        tbody a.edit {
+            color: var(--primary);
             border-color: var(--primary);
-            background-color: var(--primary-light);
         }
+        tbody a.edit:hover {
+            background-color: var(--primary-light);
+            box-shadow: 0 0 5px var(--primary);
+        }
+
+        tbody a.details {
+            color: var(--success);
+            border-color: var(--success);
+        }
+        tbody a.details:hover {
+            background-color: var(--success-hover);
+            color: white;
+            box-shadow: 0 0 5px var(--success-hover);
+        }
+
         tbody a.delete {
             color: var(--danger);
             border-color: var(--danger);
@@ -114,31 +200,35 @@
             background-color: var(--danger);
             color: white;
             border-color: var(--danger-hover);
+            box-shadow: 0 0 5px var(--danger-hover);
         }
-        tbody a.btn-details {
-            background-color: var(--success);
-            color: white;
-            border-color: var(--success);
-        }
-        tbody a.btn-details:hover {
-            background-color: #17a673;
+
+        /* Icônes FontAwesome dans les boutons d’action */
+        tbody a i {
+            font-size: 0.9rem;
         }
     </style>
+    <!-- Assure-toi que FontAwesome est chargé dans ton layout/base -->
 </head>
 <body>
 <div layout:fragment="content" class="dashboard-container">
-    <h2>Machines du système d’information</h2>
-    <a th:href="@{/machines/add}" class="btn-primary">Ajouter une machine</a>
-    <a th:href="@{/machines/export}" class="btn btn-success d-flex align-items-center">
-        <i class="fas fa-file-excel me-2"></i>Exporter Rapport
-    </a>
+    <div class="header">
+        <h2><i class="fas fa-desktop text-primary"></i> Machines du système d’information</h2>
+        <div class="actions">
+            <a th:href="@{/machines/add}" class="btn-primary">
+                <i class="fas fa-plus"></i> Ajouter une machine
+            </a>
+            <a th:href="@{/machines/export}" class="btn-success">
+                <i class="fas fa-file-excel"></i> Exporter Rapport
+            </a>
+        </div>
+    </div>
     <table>
         <thead>
         <tr>
             <th>Nom</th>
             <th>Type</th>
             <th>Fabricant</th>
-            <th>Modèle</th>
             <th>Adresse IP</th>
             <th>Système d’exploitation</th>
             <th>Actions</th>
@@ -149,13 +239,19 @@
             <td th:text="${machine.name}"></td>
             <td th:text="${machine.type}"></td>
             <td th:text="${machine.manufacturer}"></td>
-            <td th:text="${machine.model}"></td>
             <td th:text="${machine.ipAddress}"></td>
             <td th:text="${machine.operatingSystem}"></td>
-            <td>
-                <a th:href="@{'/machines/edit/' + ${machine.id}}" class="edit">Modifier</a> |
-                <a th:href="@{'/machines/' + ${machine.id}}" class="btn-details">Détails</a> |
-                <a th:href="@{'/machines/delete/' + ${machine.id}}" class="delete" onclick="return confirm('Supprimer cette machine ?');">Supprimer</a>
+            <td class="actions">
+                <a th:href="@{'/machines/edit/' + ${machine.id}}" class="edit" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a th:href="@{'/machines/' + ${machine.id}}" class="details" title="Détails">
+                    <i class="bi bi-eye"></i>
+                </a>
+                <a th:href="@{'/machines/delete/' + ${machine.id}}" class="delete"
+                   onclick="return confirm('Supprimer cette machine ?');" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                </a>
             </td>
         </tr>
         </tbody>
