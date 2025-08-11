@@ -92,7 +92,6 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
    ```bash 
    http://localhost:8080/login
 
-
 ## 🔒 Contraintes
 
 - Délai court (sprints hebdomadaires)
