@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Cartographie - ' + ${entreprise.name}"></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #cfd9df, #e2ebf0);
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            font-size: 28px;
+        }
+
+        /* Conteneur global */
+        .cartography {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        /* Liste des étages sur le côté */
+        .floors-labels {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 40px;
+        }
+
+        .floor-side-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            background: #bdc3c7;
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            text-align: center;
+            min-width: 100px;
+        }
+
+        /* Bâtiment */
+        .building {
+            width: 420px;
+            border: 6px solid #2c3e50;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #34495e;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+
+        /* Un étage */
+        .floor {
+            border-top: 2px solid #2c3e50;
+            background: #ecf0f1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: relative;
+            min-height: 120px;
+        }
+
+        /* Machine */
+        .machine {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            width: 110px;
+            text-align: center;
+            transition: transform 0.25s;
+        }
+
+        .machine:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .machine-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .machine-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #2c3e50;
+        }
+
+        .machine-ip {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+<h1 th:text="'Cartographie de l’entreprise : ' + ${entreprise.name}"></h1>
+
+<div class="cartography">
+
+    <!-- Colonne avec les labels des étages -->
+    <div class="floors-labels">
+        <div th:each="entry : ${machinesParEtage}" class="floor-side-label"
+             th:text="'Étage ' + ${entry.key}">
+        </div>
+    </div>
+
+    <!-- Bâtiment -->
+    <div class="building">
+        <!-- Étages -->
+        <div th:each="entry : ${machinesParEtage}" class="floor">
+            <!-- Machines dans cet étage -->
+            <div th:each="machine : ${entry.value}" class="machine">
+                <div class="machine-icon">
+                    <!-- Icônes selon le type -->
+                    <span th:if="${machine.type.toLowerCase().contains('serveur')}">🖥️</span>
+                    <span th:if="${machine.type.toLowerCase().contains('pc')}">💻</span>
+                    <span th:if="${machine.type.toLowerCase().contains('routeur')}">📡</span>
+                    <span th:if="${machine.type.toLowerCase().contains('switch')}">🔀</span>
+                    <span th:if="${machine.type.toLowerCase().contains('firewall')}">🛡️</span>
+                    <span th:unless="${machine.type.toLowerCase().matches('.*(serveur|pc|routeur|switch|firewall).*')}">⚙️</span>
+                </div>
+                <div class="machine-name" th:text="${machine.name}"></div>
+                <div class="machine-ip" th:text="${machine.ipAddress}"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
