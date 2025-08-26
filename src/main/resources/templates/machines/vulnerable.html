@@ -4,7 +4,6 @@
       layout:decorate="~{layout/base}">
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
     <title>Machines vulnérables | Tableau de Bord</title>
     <style>
         :root {
@@ -17,10 +16,10 @@
             --border: #e3e6f0;
             --text-muted: #6c757d;
             --text-dark: #343a40;
-            --danger: #e74a3b;
-            --danger-hover: #be2c24;
-            --success: #28a745;
-            --success-hover: #218838;
+            --danger: #cc0e00;
+            --middanger: #e68029;
+            --warning: #f6c23e;
+            --success: #1cc88a;
         }
 
         body {
@@ -35,7 +34,7 @@
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
             padding: 2rem;
             border: 1px solid var(--border);
-            max-width: 1200px;
+            max-width: 1400px;
             margin: auto;
         }
 
@@ -57,7 +56,7 @@
             margin: 0;
         }
 
-        .btn-primary, .btn-success {
+        .btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -68,44 +67,35 @@
             font-size: 0.9rem;
             cursor: pointer;
             text-decoration: none;
+            background-color: var(--primary);
+            color: white;
             transition: all 0.3s ease;
         }
 
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
         .btn-primary:hover {
             background-color: var(--primary-hover);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(78, 115, 223, 0.2);
         }
 
-        .btn-success {
-            background-color: var(--success);
-            color: white;
-        }
-        .btn-success:hover {
-            background-color: var(--success-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-            font-size: 0.9rem;
+            border-collapse: collapse;
+            min-width: 1200px;
         }
 
-        thead tr {
+        thead {
             background-color: var(--primary);
             color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            border-radius: 12px;
-            display: table;
-            width: 100%;
-            table-layout: fixed;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
 
         thead th {
@@ -113,128 +103,135 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            user-select: none;
             text-align: left;
-        }
-
-        tbody {
-            display: block;
-            max-height: 400px;
-            overflow-y: auto;
         }
 
         tbody tr {
             background-color: var(--lighter);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-            margin-bottom: 8px;
-            border-radius: 12px;
-            display: table;
-            width: 100%;
-            table-layout: fixed;
+            border-bottom: 1px solid var(--border);
             transition: background-color 0.3s ease;
         }
 
         tbody tr:hover {
             background-color: var(--primary-light);
-            cursor: default;
         }
 
         tbody td {
             padding: 1rem 1.5rem;
-            border-bottom: none;
-            color: var(--text-dark);
-            vertical-align: middle;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        tbody td.actions {
-            white-space: nowrap;
-            display: flex;
-            gap: 0.5rem;
-            justify-content: flex-start;
-        }
-
-        tbody a {
-            font-weight: 600;
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
-            border: 1px solid transparent;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        tbody a.edit {
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-        tbody a.edit:hover {
-            background-color: var(--primary-light);
-            box-shadow: 0 0 5px var(--primary);
-        }
-
-        tbody a.details {
-            color: var(--success);
-            border-color: var(--success);
-        }
-        tbody a.details:hover {
-            background-color: var(--success-hover);
-            color: white;
-            box-shadow: 0 0 5px var(--success-hover);
-        }
-
-        tbody a.delete {
-            color: var(--danger);
-            border-color: var(--danger);
-        }
-        tbody a.delete:hover {
-            background-color: var(--danger);
-            color: white;
-            border-color: var(--danger-hover);
-            box-shadow: 0 0 5px var(--danger-hover);
-        }
-
-        tbody a i {
+            vertical-align: top;
+            word-wrap: break-word;
             font-size: 0.9rem;
         }
+
+        .cve-cause {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .cve-score {
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .cve-score.low { background-color: var(--success); }
+        .cve-score.medium { background-color: var(--warning); }
+        .cve-score.high { background-color: var(--middanger); }
+        .cve-score.critical { background-color: var(--danger); }
+
+        ul.cve-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        ul.cve-list li {
+            margin-bottom: 0.4rem;
+            background-color: var(--primary-light);
+            border-radius: 8px;
+            padding: 0.3rem 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .cve-id {
+            font-weight: 700;
+        }
+        .severity-square {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            margin-right: 0.5rem;
+            border-radius: 3px;
+        }
+        .low { background-color: #1cc88a; }      /* vert */
+        .medium { background-color: #f6c23e; }   /* jaune */
+        .high { background-color: #e67e22; }     /* orange */
+        .critical { background-color: #e74a3b; } /* rouge */
     </style>
 </head>
 <body>
 <div layout:fragment="content" class="dashboard-container">
     <div class="header">
-        <h2><i class="bi bi-shield-exclamation text-primary"></i> Machines vulnérables détectées</h2>
+        <h2><i class="bi bi-shield-exclamation"></i> Machines vulnérables détectées</h2>
         <div class="actions">
             <a th:href="@{/machines}" class="btn-primary">
                 <i class="bi bi-arrow-left"></i> Retour à la liste
             </a>
         </div>
     </div>
-    <table>
-        <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Type</th>
-            <th>Fabricant</th>
-            <th>Adresse IP</th>
-            <th>Système d’exploitation</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="machine : ${machines}">
-            <td th:text="${machine.name}">Nom</td>
-            <td th:text="${machine.type}">Type</td>
-            <td th:text="${machine.manufacturer}">Fabricant</td>
-            <td th:text="${machine.ipAddress}">IP</td>
-            <td th:text="${machine.operatingSystem}">OS</td>
-        </tr>
-        </tbody>
-    </table>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th> </th>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Fabricant</th>
+                <th>IP</th>
+                <th>Système</th>
+                <th>Cause</th>
+                <th>Score CVSS</th>
+                <th>CVE / Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="machine : ${machines}">
+                <td>
+                    <span class="severity-square"
+                          th:classappend="${machine.cveScore >= 9} ? 'critical' :
+                          (${machine.cveScore >= 7} ? 'high' :
+                          (${machine.cveScore >= 4} ? 'medium' : 'low'))">
+                    </span>
+                </td>
+
+                <td th:text="${machine.name}"></td>
+                <td th:text="${machine.type}"></td>
+                <td th:text="${machine.manufacturer}"></td>
+                <td th:text="${machine.ipAddress}"></td>
+                <td th:text="${machine.operatingSystem}"></td>
+                <td class="cve-cause" th:text="${machine.cveCause}"></td>
+                <td>
+                    <span th:text="${machine.cveScore}"
+                          th:classappend="${machine.cveScore >= 9} ? 'cve-score critical' :
+                          (${machine.cveScore >= 7} ? 'cve-score high' :
+                          (${machine.cveScore >= 4} ? 'cve-score medium' : 'cve-score low'))">
+                    </span>
+                </td>
+
+                <td>
+                    <ul class="cve-list">
+                        <li th:each="cve : ${machine.cveDetails}">
+                            <span class="cve-id" th:text="${cve.cveId}"></span> -
+                            <span th:text="${cve.description}"></span>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>
