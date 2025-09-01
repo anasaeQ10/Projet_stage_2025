@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de bord - Statistiques</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --admin-color: #dc3545;
+            --normal-color: #28a745;
+            --machine-color: #007bff;
+            --vuln-color: #fd7e14;
+        }
+        .stat-card { border-radius: 10px; border-left: 4px solid; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; height: 100%; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .admin-card { border-left-color: var(--admin-color); }
+        .normal-card { border-left-color: var(--normal-color); }
+        .machine-card { border-left-color: var(--machine-color); }
+        .vuln-card { border-left-color: var(--vuln-color); }
+        .stat-value { font-size: 2.5rem; font-weight: 700; }
+        .stat-icon { font-size: 2.5rem; opacity: 0.2; }
+        .card canvas { width: 100% !important; }
+    </style>
+</head>
+<body>
+<div class="container-fluid py-4" layout:fragment="content">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="bi bi-speedometer2 me-2 text-primary"></i>Tableau de bord</h2>
+        <span class="badge bg-primary"><i class="bi bi-shield-lock me-1"></i>Espace Admin</span>
+    </div>
+
+    <!-- Statistiques Machines -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card machine-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted text-uppercase small">Total Machines</h6>
+                            <h2 class="stat-value" th:text="${totalMachines}">0</h2>
+                        </div>
+                        <i class="bi bi-hdd-fill stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card machine-card">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Par Type</h6>
+                    <ul class="list-unstyled mb-0" th:each="entry : ${machinesByType}">
+                        <li th:text="|${entry.key} : ${entry.value}|">Type : 0</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card vuln-card">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">Par Sévérité</h6>
+                    <ul class="list-unstyled mb-0" th:each="entry : ${machinesBySeverity}">
+                        <li th:text="|${entry.key} : ${entry.value}|">Sévérité : 0</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques Utilisateurs -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card admin-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted text-uppercase small">Admins</h6>
+                            <h2 class="stat-value text-danger" th:text="${adminsCount}">0</h2>
+                        </div>
+                        <i class="bi bi-person-fill-lock stat-icon text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card normal-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted text-uppercase small">Utilisateurs Normaux</h6>
+                            <h2 class="stat-value text-success" th:text="${normalUsersCount}">0</h2>
+                        </div>
+                        <i class="bi bi-person-fill stat-icon text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card machine-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted text-uppercase small">Total Utilisateurs</h6>
+                            <h2 class="stat-value text-primary" th:text="${totalUsers}">0</h2>
+                        </div>
+                        <i class="bi bi-people-fill stat-icon text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vulnérabilités récentes -->
+    <div class="card mb-4">
+        <div class="card-header bg-white border-bottom-0">
+            <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>Vulnérabilités récentes</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <strong>Total Vulnérabilités : </strong><span th:text="${totalVulnerabilities}">0</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID_CVE</th>
+                        <th>Machine</th>
+                        <th>Score CVE</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="vuln : ${recentVulnerabilities}">
+                        <td th:text="${vuln.cveId}">ID</td>
+                        <td th:text="${vuln.machine.name}">Machine</td>
+                        <td th:text="${vuln.machine.cveScore}">0</td>
+                        <td th:text="${vuln.description}">Description</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Utilisateurs par mois</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="usersByMonthChart" style="height:400px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Machines vulnérables vs sécurisées</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="machinesVulnChart" style="height:400px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Données dynamiques pour Chart.js -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const usersLabels = /*[[${usersByMonth.keySet()}]]*/ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
+    const usersData   = /*[[${usersByMonth.values()}]]*/ [5,10,8,12,15,18,20,25];
+    const machinesVulnData = /*[[${machinesVulnCounts}]]*/ [12,38];
+    /*]]>*/
+</script>
+
+<!-- Initialisation Chart.js -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Utilisateurs par mois (Bar chart)
+        const ctxUsers = document.getElementById('usersByMonthChart').getContext('2d');
+        new Chart(ctxUsers, {
+            type: 'bar',
+            data: {
+                labels: usersLabels,
+                datasets: [{
+                    label: 'Utilisateurs',
+                    data: usersData,
+                    backgroundColor: 'rgba(0,123,255,0.7)',
+                    borderColor: '#007bff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+
+        // Machines vulnérables vs sécurisées (Pie chart)
+        const ctxMachines = document.getElementById('machinesVulnChart').getContext('2d');
+        new Chart(ctxMachines, {
+            type: 'pie',
+            data: {
+                labels: ['Vulnérables','Sécurisées'],
+                datasets: [{
+                    data: machinesVulnData,
+                    backgroundColor: ['#dc3545','#28a745'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    });
+</script>
+
+</body>
+</html>
