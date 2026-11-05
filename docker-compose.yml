@@ -1,42 +1,44 @@
 version: '3.8'
 
 services:
-  mysqldb:
+  db:
     image: mysql:8.0
-    container_name: mysqldb
+    container_name: vscanner_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_DATABASE: vscanner_db
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "8889:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - vscanner-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   app:
     build: .
-    container_name: vulnerability-scanner-app
+    container_name: vscanner_app
     restart: always
     ports:
       - "8080:8080"
-    depends_on:
-      - mysqldb
     environment:
-      # Connexion à la base de données via le nom de service Docker 'mysqldb'
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/vscanner_db?useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-
-      # Configuration de l'API NVD (v2.0)
-      NVD_API_KEY: ${NVD_API_KEY}
-      NVD_API_BASE_URL: https://services.nvd.nist.gov/rest/json/cves/1.0
-
-      # Configuration du service Mailtrap
-      SPRING_MAIL_HOST: smtp.mailtrap.io
-      SPRING_MAIL_PORT: 587
-      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
-      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - vscanner-net
 
 volumes:
   mysql_data:
+
+networks:
+  vscanner-net:
+    driver: bridge
