@@ -1,44 +1,154 @@
+# Version du format Docker Compose (obsolète dans les versions récentes,
+# mais conservée ici pour respecter ton fichier initial).
 version: '3.8'
 
+# Déclaration des services (conteneurs) de notre application.
 services:
+
+  # ==========================================
+  # SERVICE 1 : BASE DE DONNÉES MYSQL
+  # ==========================================
+
   db:
+
+    # Image officielle MySQL, version 8.0.
+    # Docker télécharge cette image depuis Docker Hub si elle n'existe pas localement.
     image: mysql:8.0
+
+    # Nom personnalisé du conteneur.
+    # Permet de le retrouver facilement avec docker ps.
     container_name: vscanner_mysql
+
+    # Redémarre automatiquement le conteneur s'il s'arrête.
+    # always signifie que Docker essaie toujours de le redémarrer.
     restart: always
+
+    # Variables d'environnement transmises au conteneur MySQL.
     environment:
+
+      # Crée automatiquement cette base de données
+      # lors de la première initialisation du volume MySQL.
       MYSQL_DATABASE: vscanner_db
+
+      # Définit le mot de passe du compte administrateur root.
       MYSQL_ROOT_PASSWORD: root
+
+    # Publication des ports entre notre machine et le conteneur.
     ports:
+
+      # 8889 = port accessible depuis notre Mac.
+      # 3306 = port utilisé par MySQL à l'intérieur du conteneur.
+      # Permet de se connecter à MySQL depuis notre Mac via localhost:8889.
       - "8889:3306"
+
+    # Déclaration des volumes utilisés par ce service.
     volumes:
+
+      # Associe le volume Docker mysql_data au dossier /var/lib/mysql.
+      # MySQL stocke ses fichiers de données dans ce répertoire.
+      # Les données persistent même si le conteneur est supprimé.
       - mysql_data:/var/lib/mysql
+
+    # Connecte le conteneur MySQL au réseau Docker.
     networks:
+
+      # Nom du réseau partagé avec Spring Boot.
       - vscanner-net
+
+    # Vérifie automatiquement si MySQL fonctionne correctement.
     healthcheck:
+
+      # Commande exécutée pour vérifier si le serveur MySQL répond.
+      # CMD indique que Docker exécute directement la commande.
+      # mysqladmin ping vérifie la disponibilité du serveur.
+      # -h localhost indique que MySQL est testé depuis son conteneur.
+      # -u root utilise le compte administrateur.
+      # -proot fournit le mot de passe root (sans espace après -p).
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+
+      # Effectue une vérification toutes les 5 secondes.
       interval: 5s
+
+      # Chaque vérification doit répondre en moins de 5 secondes.
       timeout: 5s
+
+      # Après 10 vérifications échouées, le conteneur devient unhealthy.
       retries: 10
 
+  # ==========================================
+  # SERVICE 2 : APPLICATION SPRING BOOT
+  # ==========================================
+
   app:
+
+    # Construit une image Docker à partir du Dockerfile.
+    # Le point (.) représente le répertoire courant du projet.
     build: .
+
+    # Nom personnalisé du conteneur Spring Boot.
     container_name: vscanner_app
+
+    # Redémarre automatiquement le conteneur s'il s'arrête.
     restart: always
+
+    # Publication du port de l'application.
     ports:
+
+      # 8080 côté Mac : accès depuis le navigateur.
+      # 8080 côté conteneur : port sur lequel Spring Boot écoute.
       - "8080:8080"
+
+    # Variables d'environnement transmises à Spring Boot.
     environment:
+
+      # URL JDBC de connexion à MySQL.
+      # jdbc : API Java de connexion aux bases de données.
+      # mysql : type de base de données.
+      # db : nom du service MySQL dans Docker Compose.
+      # 3306 : port interne de MySQL.
+      # vscanner_db : nom de la base de données.
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/vscanner_db?useSSL=false&allowPublicKeyRetrieval=true
+
+      # Nom d'utilisateur utilisé par Spring Boot pour se connecter à MySQL.
       SPRING_DATASOURCE_USERNAME: root
+
+      # Mot de passe utilisé pour la connexion à MySQL.
       SPRING_DATASOURCE_PASSWORD: root
+
+    # Définit les dépendances entre les services.
     depends_on:
+
+      # Notre application dépend du service db.
       db:
+
+        # Attendre que le healthcheck de MySQL soit réussi
+        # avant de démarrer Spring Boot.
         condition: service_healthy
+
+    # Connecte Spring Boot au même réseau que MySQL.
+    # Cela permet aux deux conteneurs de communiquer.
     networks:
       - vscanner-net
 
+# ==========================================
+# DÉCLARATION DES VOLUMES DOCKER
+# ==========================================
+
 volumes:
+
+  # Déclare un volume Docker nommé mysql_data.
+  # Il conserve les données MySQL indépendamment du conteneur.
   mysql_data:
 
+# ==========================================
+# DÉCLARATION DES RÉSEAUX DOCKER
+# ==========================================
+
 networks:
+
+  # Création du réseau personnalisé partagé par les services.
   vscanner-net:
+
+    # bridge permet aux conteneurs de communiquer
+    # sur un réseau virtuel isolé du réseau Docker par défaut.
     driver: bridge
