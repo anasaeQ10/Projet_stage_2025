@@ -1,0 +1,157 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vscanner
+---
+# ==========================================
+# CONFIGMAP & SECRETS
+# ==========================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vscanner-config
+  namespace: vscanner
+data:
+  SPRING_DATASOURCE_URL: "jdbc:mysql://vscanner-mysql:3306/vscanner_db?useSSL=false&allowPublicKeyRetrieval=true"
+  SPRING_DATASOURCE_USERNAME: "root"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  SPRING_JPA_SHOW_SQL: "true"
+  SPRING_THYMELEAF_CACHE: "false"
+  NVD_API_BASE_URL: "https://services.nvd.nist.gov/rest/json/cves/1.0"
+  SPRING_MAIL_HOST: "smtp.mailtrap.io"
+  SPRING_MAIL_PORT: "587"
+  SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+  SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vscanner-secret
+  namespace: vscanner
+type: Opaque
+stringData:
+  SPRING_DATASOURCE_PASSWORD: "root"
+  MYSQL_ROOT_PASSWORD: "root"
+  NVD_API_KEY: "928fe226-82c2-4dc0-988f-4b3f6dd6653a"
+  SPRING_MAIL_USERNAME: "67688c41a08087"
+  SPRING_MAIL_PASSWORD: "2bffe1a207fc03"
+---
+# ==========================================
+# BASE DE DONNÉES MYSQL
+# ==========================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: vscanner
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vscanner-mysql
+  namespace: vscanner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vscanner-mysql
+  template:
+    metadata:
+      labels:
+        app: vscanner-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vscanner-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              value: "vscanner_db"
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vscanner-mysql
+  namespace: vscanner
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: vscanner-mysql
+  clusterIP: None
+---
+# ==========================================
+# APPLICATION SPRING BOOT
+# ==========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vscanner-app
+  namespace: vscanner
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vscanner-app
+  template:
+    metadata:
+      labels:
+        app: vscanner-app
+    spec:
+      containers:
+        - name: vscanner-app
+          image: vscanner_app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: vscanner-config
+            - secretRef:
+                name: vscanner-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vscanner-service
+  namespace: vscanner
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  selector:
+    app: vscanner-app
