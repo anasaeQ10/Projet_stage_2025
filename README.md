@@ -99,20 +99,23 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 - Respect des normes de sécurité (RGPD, CVSS)
 - Intégration API fiable et à jour
 
-##À utiliser pendant votre pause ou la nuit. Les ressources de calcul ne sont plus facturées.
+## À utiliser pendant votre pause ou la nuit. Les ressources de calcul ne sont plus facturées.
 
-# Mettre en pause le cluster AKS
-az aks stop --resource-group vscanner-rg --name vscanner-cluster
+### Mettre en pause le cluster AKS :
+ ```bash 
+ az aks stop --resource-group vscanner-rg --name vscanner-cluster
 
-# Vérifier l'état de la pause (PowerState)
-az aks show -g vscanner-rg -n vscanner-cluster --query "powerState.code" -o tsv
+### Vérifier l'état de la pause (PowerState) :
+ ```bash 
+ az aks show -g vscanner-rg -n vscanner-cluster --query "powerState.code" -o tsv
 
-# Reprendre l'exécution plus tard
-az aks start --resource-group vscanner-rg --name vscanner-cluster
+### Reprendre l'exécution plus tard :
+ ```bash 
+ az aks start --resource-group vscanner-rg --name vscanner-cluster
 
-✔ Résultat attendu (pour la commande show) :
-
-Stopped
+### ✔ Résultat attendu (pour la commande show) :
+ ```bash 
+ Stopped
 
 ## 👨‍💻 Auteur
 
