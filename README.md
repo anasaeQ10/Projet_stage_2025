@@ -102,19 +102,19 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 ## À utiliser pendant votre pause ou la nuit. Les ressources de calcul ne sont plus facturées.
 ```bash
 ### Mettre en pause le cluster AKS :
-   ```bash 
+    
    az aks stop --resource-group vscanner-rg --name vscanner-cluster
 
 ### Vérifier l'état de la pause (PowerState) :
-   ```bash 
+   
    az aks show -g vscanner-rg -n vscanner-cluster --query "powerState.code" -o tsv
 
 ### Reprendre l'exécution plus tard :
-   ```bash 
+   
    az aks start --resource-group vscanner-rg --name vscanner-cluster
 
 ### ✔ Résultat attendu (pour la commande show) :
-   ```bash 
+   
    Stopped
 ```
 ## 👨‍💻 Auteur
