@@ -13,6 +13,8 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 - Générer des rapports et des alertes.
 - Centraliser les données pour un meilleur suivi.
 - Proposer un tableau de bord synthétique pour la visualisation.
+- Conteneuriser l'application avec Docker et automatiser son déploiement.
+- Orchestrer les charges de travail sur le Cloud via Azure Kubernetes Service (AKS).
 
 ## 🧩 Fonctionnalités
 
@@ -43,6 +45,11 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 - Graphiques et indicateurs
 - Suivi des périodes d’attaque
 
+### ☁️ DevOps, Conteneurisation & Cloud (Docker, Kubernetes & Azure)
+- **Conteneurisation Docker** : Packaging de l'application et de la base de données dans des conteneurs isolés via un fichier `Dockerfile` et orchestration multi-conteneurs avec `docker-compose`.
+- **Orchestration Kubernetes (K8s)** : Déploiement des manifests de configuration (`Deployment`, `Service` de type `LoadBalancer`, `PersistentVolumeClaim`).
+- **Cloud Azure (AKS)** : Hébergement et gestion du cluster Kubernetes administré via Azure CLI (`az aks`).
+
 ## 🛠️ Stack technique (proposée)
 
 - **Frontend** : Spring MVC, Thymeleaf
@@ -52,6 +59,7 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 - **Outils externes** : Nmap
 - **PDF / Excel** : Puppeteer, ReportLab, Pandas
 - **Sécurité** : Auth JWT, RGPD, hashage mot de passe, logs d’audit
+- **Conteneurisation & Cloud** : Docker, Docker Compose, Kubernetes (kubectl), Azure Kubernetes Service (AKS), Azure CLI
 
 ## 📆 Planification Agile
 
@@ -61,15 +69,23 @@ Ce projet a pour objectif de concevoir une application web permettant aux admini
 | 1 | Authentification & utilisateurs | 28/07/2025 |
 | 2 | Composants & vulnérabilités | 11/08/2025 |
 | 3 | Rapports & tableau de bord | 25/08/2025 |
-| 4 | Tests finaux & améliorations | 01/09/2025 |
+| 4 | Conteneurisation Docker, déploiement K8s & Azure AKS | 01/09/2025 |
+| 5 | Tests finaux & améliorations | 08/09/2025 |
 
 ## ▶️ Lancement du projet
 
 ### Prérequis
 
-- Java 17+
-- Maven
-- MySQL (MAMP,XAMP,...)
+- Java 17+ / Maven
+- Docker & Docker Compose
+- Azure CLI (`az`) & `kubectl` (pour le déploiement Cloud)
+
+### Étapes (Lancement local avec Docker Compose)
+
+1. Cloner le dépôt :
+   ```bash
+   git clone [https://github.com/anasaeQ10/Projet_stage_2025.git](https://github.com/anasaeQ10/Projet_stage_2025.git)
+   cd vulnerabilityscanner
 
 ### Étapes
 
