@@ -1,53 +1,141 @@
+
+# ============================================================
+# NOM DU WORKFLOW
+# ============================================================
+
 name: CI/CD Pipeline - VScanner AKS
+# Nom affiché dans l'onglet Actions de GitHub
+
+
+# ============================================================
+# DÉCLENCHEMENT AUTOMATIQUE DU WORKFLOW
+# ============================================================
 
 on:
   push:
     branches: [ main ]
+    # Le workflow se déclenche automatiquement
+    # lorsqu'un développeur effectue un push sur main.
+
+
+# ============================================================
+# JOBS : ENSEMBLE DES TÂCHES À EXÉCUTER
+# ============================================================
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
 
-    # Ajout d'un service MySQL pour les tests
+  # ----------------------------------------------------------
+  # JOB 1 : INTÉGRATION CONTINUE (CI)
+  # ----------------------------------------------------------
+
+  build-and-test:
+
+    runs-on: ubuntu-latest
+    # GitHub fournit une machine virtuelle Linux Ubuntu
+    # pour exécuter les commandes du workflow.
+
+    # Service MySQL temporaire utilisé pendant les tests
     services:
       mysql:
         image: mysql:8.0
+        # Télécharge et démarre un conteneur MySQL 8.0.
+
         env:
           MYSQL_ROOT_PASSWORD: root
+          # Définit le mot de passe administrateur MySQL.
+
           MYSQL_DATABASE: vscanner_db
+          # Crée automatiquement la base de données de test.
+
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping -h localhost" --health-interval=10s --health-timeout=5s --health-retries=3
+          # Expose le port MySQL du conteneur sur le runner.
+
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+          # Vérifie périodiquement que MySQL fonctionne.
+          # GitHub attend que le service soit opérationnel
+          # avant de lancer les étapes suivantes.
 
     steps:
+
+      # Étape 1 : récupérer le code source du dépôt GitHub
       - name: Checkout code
         uses: actions/checkout@v4
+        # Clone le dépôt dans l'environnement de travail.
 
+      # Étape 2 : installer Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
+
         with:
           java-version: '17'
-          distribution: 'temurin'
-          cache: maven
+          # Version du JDK utilisée pour compiler le projet.
 
+          distribution: 'temurin'
+          # Distribution OpenJDK fournie par Eclipse Temurin.
+
+          cache: maven
+          # Met en cache les dépendances Maven
+          # pour accélérer les prochains builds.
+
+      # Étape 3 : compiler le projet et exécuter les tests
       - name: Build and Run Tests with Maven
         run: mvn clean test
+        # clean : supprime les anciens fichiers de compilation.
+        # test  : compile le code et exécute les tests automatisés.
+        # Si un test échoue, le job échoue également.
+
+
+  # ----------------------------------------------------------
+  # JOB 2 : DÉPLOIEMENT CONTINU (CD)
+  # ----------------------------------------------------------
 
   deploy-to-aks:
+
     needs: build-and-test
+    # Ce job ne démarre que si build-and-test réussit.
+    # Cela évite de déployer une application non validée.
+
     runs-on: ubuntu-latest
+    # Utilise une nouvelle machine virtuelle Ubuntu.
+
     steps:
+
+      # Étape 1 : récupérer le code source
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Étape 2 : installer Kubectl
       - name: Set up Kubectl
         uses: azure/setup-kubectl@v3
+        # Kubectl est l'outil en ligne de commande
+        # permettant de communiquer avec Kubernetes.
 
+      # Étape 3 : connexion au cluster AKS et déploiement
       - name: Deploy to AKS
+
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          # Récupère le kubeconfig depuis les GitHub Secrets.
+          # Ce fichier contient les informations nécessaires
+          # pour accéder au cluster Kubernetes.
+
         run: |
+
+          # Crée le dossier de configuration Kubernetes
           mkdir -p ~/.kube
+
+          # Décode le kubeconfig stocké en Base64
+          # et l'enregistre dans le dossier attendu par Kubectl
           echo "$KUBE_CONFIG" | base64 --decode > ~/.kube/config
+
+          # Vérifie la connexion au cluster AKS
           kubectl get nodes
+
+          # Redémarre les Pods du Deployment Spring Boot
+          # dans le namespace vscanner
           kubectl rollout restart deployment/vscanner-app -n vscanner
