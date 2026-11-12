@@ -1,157 +1,276 @@
-apiVersion: v1
-kind: Namespace
+
+# ============================================================
+# 1. NAMESPACE : ESPACE DE TRAVAIL DU PROJET
+# ============================================================
+
+apiVersion: v1                 # Version de l'API Kubernetes
+kind: Namespace                # Type de ressource : Namespace
+
 metadata:
-  name: vscanner
+  name: vscanner               # Nom de l'espace de travail
+
+
 ---
-# ==========================================
-# CONFIGMAP & SECRETS
-# ==========================================
+# ============================================================
+# 2. CONFIGMAP : CONFIGURATIONS NON SENSIBLES
+# ============================================================
+
 apiVersion: v1
-kind: ConfigMap
+kind: ConfigMap                # Stocke les variables de configuration
+
 metadata:
-  name: vscanner-config
-  namespace: vscanner
+  name: vscanner-config        # Nom de la ConfigMap
+  namespace: vscanner          # Namespace auquel elle appartient
+
 data:
+  # Adresse JDBC de la base de données MySQL
+  # vscanner-mysql est le nom du Service Kubernetes MySQL
   SPRING_DATASOURCE_URL: "jdbc:mysql://vscanner-mysql:3306/vscanner_db?useSSL=false&allowPublicKeyRetrieval=true"
+
+  # Nom d'utilisateur pour la connexion à MySQL
   SPRING_DATASOURCE_USERNAME: "root"
+
+  # Hibernate met automatiquement à jour le schéma de la base
   SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+
+  # Active l'affichage des requêtes SQL dans les logs
   SPRING_JPA_SHOW_SQL: "true"
+
+  # Désactive le cache Thymeleaf (utile en développement)
   SPRING_THYMELEAF_CACHE: "false"
+
+  # Adresse de l'API NVD pour récupérer les vulnérabilités CVE
   NVD_API_BASE_URL: "https://services.nvd.nist.gov/rest/json/cves/1.0"
+
+  # Configuration du serveur SMTP pour l'envoi des emails
   SPRING_MAIL_HOST: "smtp.mailtrap.io"
   SPRING_MAIL_PORT: "587"
+
+  # Active l'authentification SMTP
   SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+
+  # Active le chiffrement STARTTLS pour SMTP
   SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+
+
 ---
+# ============================================================
+# 3. SECRET : INFORMATIONS SENSIBLES
+# ============================================================
+
 apiVersion: v1
-kind: Secret
+kind: Secret                     # Ressource de stockage des données sensibles
+
 metadata:
-  name: vscanner-secret
+  name: vscanner-secret          # Nom du Secret
   namespace: vscanner
-type: Opaque
-stringData:
-  SPRING_DATASOURCE_PASSWORD: "root"
-  MYSQL_ROOT_PASSWORD: "root"
-  NVD_API_KEY: "928fe226-82c2-4dc0-988f-4b3f6dd6653a"
-  SPRING_MAIL_USERNAME: "67688c41a08087"
-  SPRING_MAIL_PASSWORD: "2bffe1a207fc03"
+
+type: Opaque                     # Type générique de Secret Kubernetes
+
+stringData:                      # Accepte les valeurs sous forme de texte
+  SPRING_DATASOURCE_PASSWORD: "CHANGE_ME"
+  MYSQL_ROOT_PASSWORD: "CHANGE_ME"
+
+  # Clé d'accès à l'API NVD
+  NVD_API_KEY: "CHANGE_ME"
+
+  # Identifiants du serveur SMTP
+  SPRING_MAIL_USERNAME: "CHANGE_ME"
+  SPRING_MAIL_PASSWORD: "CHANGE_ME"
+
+
 ---
-# ==========================================
-# BASE DE DONNÉES MYSQL
-# ==========================================
+# ============================================================
+# 4. PERSISTENT VOLUME CLAIM (PVC) : STOCKAGE MYSQL
+# ============================================================
+
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolumeClaim      # Demande de stockage persistant
+
 metadata:
-  name: mysql-pvc
+  name: mysql-pvc                # Nom du PVC
   namespace: vscanner
+
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteOnce              # Autorise la lecture et l'écriture
+    # depuis un seul nœud à la fois
+
   resources:
     requests:
-      storage: 5Gi
+      storage: 5Gi               # Demande un espace de stockage de 5 Gio
+
+
 ---
+# ============================================================
+# 5. DEPLOYMENT MYSQL : DÉPLOIEMENT DE LA BASE DE DONNÉES
+# ============================================================
+
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment                # Gère la création et le maintien des Pods
+
 metadata:
-  name: vscanner-mysql
+  name: vscanner-mysql          # Nom du Deployment
   namespace: vscanner
+
 spec:
-  replicas: 1
+  replicas: 1                   # Une seule instance MySQL
+
   selector:
     matchLabels:
-      app: vscanner-mysql
-  template:
+      app: vscanner-mysql       # Identifie les Pods gérés par ce Deployment
+
+  template:                     # Modèle utilisé pour créer les Pods
     metadata:
       labels:
-        app: vscanner-mysql
+        app: vscanner-mysql     # Étiquette attribuée au Pod
+
     spec:
       containers:
-        - name: mysql
-          image: mysql:8.0
+        - name: mysql           # Nom du conteneur
+          image: mysql:8.0      # Image officielle MySQL version 8.0
+
           ports:
-            - containerPort: 3306
-          env:
+            - containerPort: 3306 # Port interne du serveur MySQL
+
+          env:                  # Variables d'environnement du conteneur
+
+            # Mot de passe administrateur MySQL
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: vscanner-secret
                   key: MYSQL_ROOT_PASSWORD
+
+            # Création automatique de la base au premier démarrage
             - name: MYSQL_DATABASE
               value: "vscanner_db"
+
+          # Montage du stockage persistant dans le conteneur
           volumeMounts:
             - name: mysql-storage
               mountPath: /var/lib/mysql
+              # Répertoire dans lequel MySQL stocke ses données
+
+      # Déclaration des volumes utilisés par le Pod
       volumes:
         - name: mysql-storage
           persistentVolumeClaim:
-            claimName: mysql-pvc
+            claimName: mysql-pvc  # Utilisation du PVC précédent
+
+
 ---
+# ============================================================
+# 6. SERVICE MYSQL : COMMUNICATION INTERNE
+# ============================================================
+
 apiVersion: v1
-kind: Service
+kind: Service                   # Expose MySQL sur le réseau Kubernetes
+
 metadata:
-  name: vscanner-mysql
+  name: vscanner-mysql          # Nom DNS utilisé par Spring Boot
   namespace: vscanner
+
 spec:
   ports:
-    - port: 3306
-      targetPort: 3306
+    - port: 3306                # Port exposé par le Service
+      targetPort: 3306          # Port du conteneur MySQL
+
   selector:
-    app: vscanner-mysql
-  clusterIP: None
+    app: vscanner-mysql         # Dirige les requêtes vers les Pods MySQL
+
+  clusterIP: None               # Service Headless :
+    # pas d'adresse IP virtuelle ClusterIP
+  # Le DNS retourne les adresses des Pods
+
+
 ---
-# ==========================================
-# APPLICATION SPRING BOOT
-# ==========================================
+# ============================================================
+# 7. DEPLOYMENT SPRING BOOT : APPLICATION VSCANNER
+# ============================================================
+
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
-  name: vscanner-app
+  name: vscanner-app            # Nom du Deployment Spring Boot
   namespace: vscanner
+
 spec:
-  replicas: 2
+  replicas: 2                   # Kubernetes maintient 2 Pods de l'application
+
   selector:
     matchLabels:
-      app: vscanner-app
+      app: vscanner-app         # Sélection des Pods gérés par le Deployment
+
   template:
     metadata:
       labels:
-        app: vscanner-app
+        app: vscanner-app       # Label attribué à chaque Pod
+
     spec:
       containers:
         - name: vscanner-app
+
+          # Image Docker utilisée pour créer les conteneurs
           image: vscanner_app:latest
+
+          # Utilise l'image locale si elle existe déjà
+          # Sinon, Kubernetes peut essayer de la télécharger
           imagePullPolicy: IfNotPresent
+
           ports:
-            - containerPort: 8080
+            - containerPort: 8080 # Port d'écoute de Spring Boot
+
+          # Injection des variables d'environnement
           envFrom:
             - configMapRef:
                 name: vscanner-config
+                # Récupère toutes les variables de la ConfigMap
+
             - secretRef:
                 name: vscanner-secret
+                # Récupère toutes les variables du Secret
+
+          # Vérifie si le Pod est prêt à recevoir du trafic
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
+
+            initialDelaySeconds: 30 # Attend 30 secondes avant le premier test
+            periodSeconds: 10        # Vérifie toutes les 10 secondes
+
+          # Vérifie si l'application fonctionne toujours
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 15
+
+            initialDelaySeconds: 60 # Attend 60 secondes avant le premier test
+            periodSeconds: 15        # Vérifie toutes les 15 secondes
+
+
 ---
+# ============================================================
+# 8. SERVICE APPLICATION : EXPOSITION VIA NODEPORT
+# ============================================================
+
 apiVersion: v1
 kind: Service
+
 metadata:
-  name: vscanner-service
+  name: vscanner-service        # Nom du Service de l'application
   namespace: vscanner
+
 spec:
-  type: NodePort
+  type: NodePort                # Expose l'application sur un port du nœud Kubernetes
+
   ports:
-    - port: 8080
-      targetPort: 8080
-      nodePort: 30080
+    - port: 8080                # Port du Service dans le cluster
+      targetPort: 8080          # Port du conteneur Spring Boot
+      nodePort: 30080           # Port externe accessible sur le nœud
+      protocol: TCP
+
   selector:
-    app: vscanner-app
+    app: vscanner-app           # Distribue le trafic entre les 2 Pods Spring Boot
